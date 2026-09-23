@@ -1,0 +1,157 @@
+/* Passport / guard profile — fork C */
+
+.pp-banner { align-items: center; }
+
+.pp-hero { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+.pp-side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* ID document */
+.pp-doc {
+  position: relative; overflow: hidden; min-width: 0;
+  background:
+    repeating-linear-gradient(115deg, rgba(21, 23, 28, 0.02) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(65deg, rgba(21, 23, 28, 0.015) 0 1px, transparent 1px 9px),
+    var(--surface);
+  border: 1px solid var(--line-2); border-radius: var(--r-lg);
+  box-shadow: var(--shadow), 0 16px 36px -22px rgba(21, 23, 28, 0.35);
+}
+.pp-doc::after {
+  content: 'SECURITY FORCE'; position: absolute; right: -6px; bottom: 46px; pointer-events: none;
+  font-size: 64px; font-weight: 800; letter-spacing: -0.04em; color: rgba(21, 23, 28, 0.025);
+}
+.pp-doc-top {
+  display: flex; align-items: center; gap: 12px; padding: 10px 22px;
+  background: var(--ink); color: #fff; border-bottom: 3px solid var(--hivis);
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.pp-doc-brand { font-weight: 600; }
+.pp-doc-kind { flex: 1; color: #b3b6bf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pp-doc-cc { padding: 1px 6px; border: 1px solid #555a66; border-radius: 3px; }
+.pp-doc-body { display: grid; grid-template-columns: auto minmax(0, 1fr) 200px; gap: 24px; padding: 24px 22px 22px; position: relative; z-index: 1; }
+.pp-photo .avatar { box-shadow: inset 0 0 0 1px rgba(21, 23, 28, 0.1), 0 2px 8px -2px rgba(21, 23, 28, 0.2); }
+.pp-fields { min-width: 0; }
+.pp-label { display: block; font-size: 10.5px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--faint); }
+.pp-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; margin-top: 3px; font-size: 30px; line-height: 1.1; }
+.pp-surname { text-transform: uppercase; letter-spacing: 0; }
+.pp-given { font-weight: 400; color: var(--ink-2); }
+.pp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 20px; margin-top: 18px; }
+.pp-field dd { margin-top: 2px; font-size: 14px; overflow-wrap: anywhere; }
+.pp-strong { font-weight: 600; font-size: 15px; }
+.pp-redacted { display: inline-block; padding: 0 6px; font-size: 12px; color: var(--faint); background: var(--sunk); border-radius: 3px; }
+.pp-verify { display: flex; flex-direction: column; gap: 10px; padding-left: 22px; border-left: 1px solid var(--line); }
+.pp-verify-head { display: flex; justify-content: space-between; align-items: baseline; }
+.pp-mrz {
+  position: relative; z-index: 1; padding: 12px 22px 14px; overflow: hidden;
+  background: #f1efe8; border-top: 1px solid var(--line);
+  font-family: var(--mono); font-weight: 500; font-size: 13.5px; letter-spacing: 0.16em; line-height: 1.55; color: #474c58; white-space: pre;
+}
+
+.pp-kv { display: flex; flex-direction: column; gap: 10px; }
+.pp-kv > div { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13.5px; }
+.pp-kv dt { color: var(--muted); flex-shrink: 0; }
+.pp-kv dd { min-width: 0; text-align: right; display: flex; justify-content: flex-end; }
+.pp-idle { display: flex; gap: 12px; align-items: flex-start; }
+.pp-idle .status-dot { width: 9px; height: 9px; margin-top: 6px; border-radius: 50%; background: var(--line-2); flex-shrink: 0; }
+.pp-compliance { display: flex; flex-direction: column; gap: 10px; }
+.pp-compliance li { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13.5px; }
+
+.pp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.pp-actions-note { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; font-size: 12.5px; color: var(--muted); }
+.pp-actor-icon { display: inline-grid; place-items: center; flex-shrink: 0; border-radius: 8px; background: var(--ink); color: #fff; }
+.pp-lede { max-width: 680px; }
+
+/* career summary */
+.pp-career { display: flex; flex-direction: column; gap: 12px; }
+.pp-career li { display: flex; align-items: center; gap: 12px; font-size: 13.5px; }
+.pp-career-bar { width: 4px; height: 28px; border-radius: 2px; flex-shrink: 0; }
+.pp-dates { font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+/* employment timeline */
+.pp-timeline { display: flex; flex-direction: column; }
+.pp-tl { position: relative; display: flex; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--line); }
+.pp-tl:last-child { border-bottom: 0; }
+.pp-tl-logo { position: relative; z-index: 1; flex-shrink: 0; }
+.pp-tl-body { flex: 1; min-width: 0; }
+.pp-tl-head { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+.pp-tl-title { font-weight: 600; font-size: 15px; }
+.pp-tl-sub { display: flex; align-items: center; gap: 7px; margin-top: 3px; color: var(--muted); font-size: 13px; }
+.pp-tl-sub .orgmark { font-size: 8px !important; border-radius: 5px; }
+.pp-tl-date { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 12.5px; color: var(--ink-2); }
+.pp-tl-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.pp-tl-actions:empty { display: none; }
+.pp-tl-empty { padding: 20px; }
+.pp-grant { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 12.5px; color: var(--info); }
+
+/* conduct */
+.pp-record { padding: 16px 18px; }
+.pp-record-top { display: flex; align-items: flex-start; gap: 12px; }
+.pp-record-title { font-weight: 600; font-size: 14.5px; }
+.pp-record-detail { margin: 10px 0 0 46px; font-size: 13.5px; color: var(--ink-2); }
+.pp-record .chips, .pp-record .pp-response, .pp-record .pp-tl-actions { margin-left: 46px; }
+.pp-record.is-retracted { background: var(--surface-2); }
+.pp-record.is-retracted .pp-record-title { text-decoration: line-through; color: var(--muted); }
+.pp-locked { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--surface-2); border: 1px dashed var(--line-2); border-radius: var(--r-lg); }
+.pp-response { margin-top: 12px; padding: 12px 14px; background: var(--warn-bg); border-radius: var(--r-sm); font-size: 13.5px; color: #4a3610; }
+.pp-response-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.pp-response-head > span { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; }
+.pp-response .badge { background: rgba(255, 255, 255, 0.75); }
+.pp-response-note { margin-top: 8px; font-size: 12.5px; color: #6b5324; }
+
+/* training */
+.pp-certs { display: flex; flex-direction: column; }
+.pp-certs li { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+.pp-certs li:last-child { border-bottom: 0; }
+.pp-licence { padding: 16px; border-radius: var(--r); background: var(--surface-2); border: 1px solid var(--line); }
+.pp-licence.tone-bad { background: var(--bad-bg); border-color: #efc9c4; }
+.pp-licence.tone-warn { background: var(--warn-bg); border-color: #efdcb0; }
+.pp-licence-no { margin-top: 4px; font-size: 22px; font-weight: 600; letter-spacing: 0.04em; }
+
+/* activity timeline (shared with guard access log) */
+.pp-activity { display: flex; flex-direction: column; gap: 20px; }
+.pp-activity-day { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; margin-bottom: 8px; }
+.pp-activity ol { display: flex; flex-direction: column; }
+.pp-activity li { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.pp-activity li:last-child { border-bottom: 0; }
+.pp-activity-line { font-size: 13.5px; }
+.pp-activity-action { color: var(--ink-2); }
+.pp-activity-detail { margin-top: 1px; font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.pp-activity-time { font-family: var(--mono); font-size: 11.5px; color: var(--faint); white-space: nowrap; padding-top: 2px; }
+
+@media (max-width: 1240px) {
+  .pp-doc-body { grid-template-columns: auto minmax(0, 1fr); }
+  .pp-verify { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, auto); justify-content: start; gap: 10px 24px; padding: 16px 0 0; border-left: 0; border-top: 1px solid var(--line); }
+  .pp-verify-head { grid-column: 1 / -1; justify-content: flex-start; gap: 8px; }
+}
+@media (max-width: 1080px) {
+  .pp-hero { grid-template-columns: minmax(0, 1fr); }
+  .pp-side { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 860px) {
+  .pp-side { grid-template-columns: minmax(0, 1fr); }
+  .pp-doc { border-radius: var(--r); }
+  .pp-doc::after { display: none; }
+  .pp-doc-top { padding: 9px 14px; font-size: 10px; gap: 8px; }
+  .pp-doc-body { grid-template-columns: auto minmax(0, 1fr); gap: 16px 14px; padding: 16px 14px; }
+  .pp-fields { display: contents; }
+  .pp-fields > .pp-field { align-self: center; }
+  .pp-name { flex-direction: column; font-size: 22px; gap: 2px; }
+  .pp-grid { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 14px; margin-top: 0; padding-top: 14px; border-top: 1px solid var(--line); }
+  .pp-verify { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; padding-top: 14px; }
+  .pp-mrz { padding: 10px 14px 12px; font-size: clamp(8px, 2.45vw, 13px); letter-spacing: 0.08em; }
+  .pp-actions > .btn { flex: 1 1 auto; }
+  .pp-actions-note { margin-left: 0; width: 100%; }
+  .pp-tl { padding: 16px; gap: 12px; }
+  .pp-tl-date { align-items: flex-start; flex-direction: row; gap: 8px; width: 100%; }
+  .pp-record { padding: 14px; }
+  .pp-record-detail, .pp-record .chips, .pp-record .pp-response, .pp-record .pp-tl-actions { margin-left: 0; }
+  .pp-locked { flex-wrap: wrap; }
+  .pp-locked .btn { width: 100%; }
+  .pp-certs li { padding: 12px 16px; flex-wrap: wrap; }
+  .pp-activity-time { display: none; }
+}
+@media (max-width: 380px) {
+  .pp-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 860px) {
+  .pp-actions .menu .icon-btn { width: 44px !important; height: 44px !important; }
+}

@@ -1,0 +1,58 @@
+/* Administration screens: team, settings, integrations, audit */
+
+.ad-perm-count { font-family: var(--mono); font-size: 11.5px; color: var(--faint); white-space: nowrap; }
+.ad-perm-preview { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-sm); }
+.ad-perm-preview li { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--faint); }
+.ad-perm-preview li.on { color: var(--ink); }
+.ad-perm-preview li.on svg { color: var(--ok); }
+.ad-invite-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+
+.ad-matrix-wrap { overflow-x: auto; }
+.ad-matrix { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ad-matrix th { position: sticky; top: 0; padding: 10px 12px; background: var(--surface-2); border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 500; color: var(--muted); text-align: center; white-space: nowrap; }
+.ad-matrix th:first-child, .ad-matrix td:first-child { text-align: left; padding-left: 20px; }
+.ad-matrix td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: center; color: var(--faint); }
+.ad-matrix td:first-child { color: var(--ink-2); min-width: 200px; }
+.ad-matrix td.on { color: var(--ok); }
+.ad-matrix tr:last-child td { border-bottom: 0; }
+.ad-matrix tbody tr:hover td { background: var(--surface-2); }
+
+.ad-profile-head { display: flex; align-items: center; gap: 14px; }
+.ad-profile-head > span:last-child { display: flex; flex-direction: column; gap: 2px; }
+.ad-profile-name { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+.ad-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; }
+.ad-facts dt { font-size: 11.5px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
+.ad-facts dd { font-size: 14px; min-width: 0; overflow-wrap: anywhere; }
+.ad-icon-line { display: flex; align-items: center; gap: 6px; }
+.ad-icon-line svg { color: var(--faint); flex-shrink: 0; }
+.ad-policy .setting-row:first-child { padding-top: 0; }
+.ad-policy .setting-row:last-child { padding-bottom: 0; }
+.ad-policy-val { font-weight: 600; font-size: 14px; text-align: right; max-width: 45%; }
+
+.ad-secret { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--ink); border-radius: var(--r-sm); }
+.ad-secret code { flex: 1; min-width: 0; color: #f1f1ee; font-size: 13px; overflow-wrap: anywhere; }
+.ad-upload { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px; border: 1px dashed var(--line-2); border-radius: var(--r); background: var(--surface-2); }
+.ad-preview { max-height: 240px; overflow-y: auto; border: 1px solid var(--line); border-radius: var(--r-sm); }
+.ad-preview-row { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: 13px; }
+.ad-preview-row:last-child { border-bottom: 0; }
+.ad-preview-note { font-size: 12px; color: var(--ok); white-space: nowrap; }
+.ad-preview-row.is-error { background: #fdf6f5; }
+.ad-preview-row.is-error .ad-preview-note { color: var(--bad); }
+.ad-preview-row.is-same .ad-preview-note { color: var(--faint); }
+
+.ad-action { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 5px; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; background: var(--sunk); color: var(--ink-2); }
+.ad-action-ok { background: var(--ok-bg); color: var(--ok); }
+.ad-action-bad { background: var(--bad-bg); color: var(--bad); }
+.ad-action-warn { background: var(--warn-bg); color: var(--warn); }
+.ad-action-info { background: var(--info-bg); color: var(--info); }
+.ad-detail { font-size: 13px; color: var(--ink-2); text-align: left; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: normal; font-weight: 400; }
+
+@media (max-width: 860px) {
+  .ad-invite-grid { grid-template-columns: minmax(0, 1fr); }
+  .ad-facts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .ad-policy .setting-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .ad-policy-val { text-align: left; max-width: none; }
+  .ad-matrix th, .ad-matrix td { padding: 10px 8px; }
+  .ad-matrix td:first-child { min-width: 160px; }
+  .ad-secret { flex-direction: column; align-items: stretch; }
+}

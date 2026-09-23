@@ -1,0 +1,60 @@
+/* Client portal — fork C */
+.cl-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
+
+/* sites */
+.cl-sites { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; }
+.cl-site { display: flex; flex-direction: column; gap: 14px; }
+.cl-site.is-short { border-top: 3px solid var(--bad); }
+.cl-site-head { display: flex; align-items: flex-start; gap: 12px; }
+.cl-site-head h3 { font-size: 16px; }
+.cl-site-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 4px; font-size: 12.5px; color: var(--muted); }
+.cl-site-meta span { display: inline-flex; align-items: center; gap: 5px; }
+.cl-site-co { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); }
+.cl-site-co b { display: block; font-size: 13.5px; }
+.cl-site-co .grow > span { display: block; font-size: 12px; color: var(--muted); }
+.cl-duty { display: flex; flex-direction: column; }
+.cl-duty li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.cl-duty li:first-child { padding-top: 0; }
+.cl-duty li:last-child { border-bottom: 0; padding-bottom: 0; }
+.cl-duty-sub { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.cl-site-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); }
+
+/* verify */
+.cl-verify { display: flex; flex-direction: column; gap: 24px; }
+.cl-verify-grid { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.cl-form { display: flex; flex-direction: column; gap: 16px; }
+.cl-wid { text-transform: uppercase; letter-spacing: 0.08em; }
+.cl-helper { padding-top: 12px; border-top: 1px dashed var(--line-2); display: flex; flex-direction: column; gap: 6px; }
+.cl-checking { display: flex; align-items: center; gap: 16px; }
+.cl-checking .skel { display: block; }
+.cl-result { overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-md); animation: pop 0.22s var(--ease); }
+.cl-result-band { display: flex; align-items: flex-start; gap: 12px; padding: 16px 20px; color: #fff; }
+.cl-result.tone-ok .cl-result-band { background: var(--ok); }
+.cl-result.tone-bad .cl-result-band { background: var(--bad); }
+.cl-result-band b { display: block; font-size: 17px; }
+.cl-result-band span { display: block; margin-top: 2px; font-size: 13.5px; opacity: 0.92; }
+.cl-result-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+.cl-person { display: flex; align-items: center; gap: 16px; }
+.cl-person-name { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+.cl-facts { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.cl-facts > div { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.cl-facts dt { color: var(--muted); }
+.cl-facts dd { font-weight: 500; text-align: right; }
+.cl-result-call { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 20px 16px; padding: 12px; background: var(--bad-bg); border-radius: var(--r); font-size: 13.5px; }
+.cl-result-call a { text-decoration: none; }
+.cl-result-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 12px 20px; background: var(--surface-2); border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+
+@media (max-width: 1080px) {
+  .cl-verify-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 860px) {
+  .cl-sites { grid-template-columns: minmax(0, 1fr); }
+  .cl-duty .btn { min-height: 44px; }
+  .cl-result-band { padding: 14px 16px; }
+  .cl-result-body { padding: 16px; }
+  .cl-result-call { margin: 0 16px 14px; }
+  .cl-result-call a { width: 100%; justify-content: center; min-height: 44px; }
+  .cl-result-foot { padding: 12px 16px; }
+  .cl-result-foot .btn { width: 100%; min-height: 44px; }
+  .cl-person-name { font-size: 19px; }
+}

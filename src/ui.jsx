@@ -6,17 +6,17 @@
            loading disabledReason="…">  (disabledReason disables + explains in a tooltip)
   Avatars: <Avatar name seed src size ring /> (illustrated portrait from `seed`, or uploaded `src`)
            <OrgMark company size />
-  Overlays: <Modal title size="sm|md|lg|xl" onClose footer>, <Drawer title subtitle onClose footer wide>,
+  Overlays: <Modal title size="sm|md|lg|xl" onClose footer> (always centred), <Drawer …> = full detail page,
             <ConfirmModal title body confirmLabel tone="danger" requireText onConfirm onClose>
   Data: <DataTable columns rows … /> — sortable, selectable, paginated, cards on mobile.
   Loading: usePageLoading(key) → boolean; <Skeleton w h/>, <SkeletonRows n/>, <PageSkeleton variant/>
 */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { createAvatar } from '@dicebear/core';
 import * as notionists from '@dicebear/notionists';
 import {
-  ArrowsLeftRight, Bell, Buildings, CaretDown, CaretLeft, CaretRight, CaretUp, CaretUpDown, Check as CheckIcon,
+  ArrowLeft, ArrowsLeftRight, Bell, Buildings, CaretDown, CaretLeft, CaretRight, CaretUp, CaretUpDown, Check as CheckIcon,
   CheckCircle, CircleNotch, ClockCounterClockwise, Copy, DotsThree, Flag, GraduationCap, IdentificationCard, Info,
   LockSimple, MagnifyingGlass, Medal, ShieldCheck, Users, Warning, WarningCircle, X, XCircle,
 } from '@phosphor-icons/react';
@@ -464,25 +464,64 @@ export function Modal({ title, subtitle, onClose, children, footer, size = 'md',
   );
 }
 
-export function Drawer({ title, subtitle, onClose, children, footer, wide, headerExtra }) {
-  useLockScroll();
+/*
+  Detail views are full pages, not side panels. <Drawer> keeps its API but renders into the
+  shell's detail slot (hiding the list behind it) with a back button, header and sticky action bar.
+*/
+export const DetailContext = createContext(null);
+
+export function DetailHost({ children }) {
+  const [host, setHost] = useState(null);
+  const [open, setOpen] = useState(0);
+  const ctx = useMemo(() => ({ host, enter: () => setOpen((n) => n + 1), leave: () => setOpen((n) => Math.max(0, n - 1)) }), [host]);
+  return (
+    <DetailContext.Provider value={ctx}>
+      <div className="page-slot" hidden={open > 0}>
+        {children}
+      </div>
+      <div ref={setHost} className="detail-root" />
+    </DetailContext.Provider>
+  );
+}
+
+export function Drawer({ title, subtitle, onClose, children, footer, headerExtra, backLabel = 'Back' }) {
+  const ctx = useContext(DetailContext);
   useEscape(onClose);
+  useEffect(() => {
+    if (!ctx) return undefined;
+    const y = window.scrollY;
+    ctx.enter();
+    window.scrollTo(0, 0);
+    return () => {
+      ctx.leave();
+      requestAnimationFrame(() => window.scrollTo(0, y));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  if (!ctx?.host)
+    return (
+      <Modal title={title} subtitle={subtitle} onClose={onClose} footer={footer} size="xl">
+        {children}
+      </Modal>
+    );
   return createPortal(
-    <div className="overlay overlay-drawer" onMouseDown={onClose}>
-      <aside className={`drawer ${wide ? 'drawer-wide' : ''}`} role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : undefined} onMouseDown={(e) => e.stopPropagation()}>
-        <header className="drawer-head">
-          <IconButton icon={X} label="Close" onClick={onClose} className="drawer-close" />
+    <article className="detail page-enter" aria-label={typeof title === 'string' ? title : undefined}>
+      <header className="detail-head">
+        <Button variant="ghost" size="sm" icon={ArrowLeft} onClick={onClose} className="detail-back">
+          {backLabel}
+        </Button>
+        <div className="detail-title">
           <div className="grow">
-            <h3>{title}</h3>
-            {subtitle && <p className="modal-sub">{subtitle}</p>}
+            <h1>{title}</h1>
+            {subtitle && <p className="page-sub">{subtitle}</p>}
           </div>
-          {headerExtra}
-        </header>
-        <div className="drawer-body">{children}</div>
-        {footer && <footer className="drawer-foot">{footer}</footer>}
-      </aside>
-    </div>,
-    document.body,
+          {headerExtra && <div className="detail-extra">{headerExtra}</div>}
+        </div>
+      </header>
+      <div className="detail-body">{children}</div>
+      {footer && <footer className="detail-foot">{footer}</footer>}
+    </article>,
+    ctx.host,
   );
 }
 

@@ -3,7 +3,7 @@ import { DownloadSimple, ShieldCheck } from '@phosphor-icons/react';
 import { useStore } from '../../store';
 import { guardById, siteById } from '../../access';
 import { Badge, Button, DataTable, EmptyState, FilterSelect, PageHead, SearchInput, downloadCSV, fmtTime } from '../../ui';
-import { GuardCell } from '../../components';
+import { GuardCell, SiteLabel } from '../../components';
 import { RESULTS } from './results';
 import './client.css';
 
@@ -70,7 +70,7 @@ export default function ClientHistory({ go }) {
         initialSort={{ key: 'time', dir: 'desc' }}
         columns={[
           { key: 'guard', header: 'Guard', width: 'minmax(200px, 1.8fr)', mobile: 'primary', render: (c) => (c.guardId ? <GuardCell id={c.guardId} size={32} /> : <span className="cell-person-text"><span className="cell-name mono">{c.input}</span><span className="cell-sub">Not recognised</span></span>) },
-          { key: 'site', header: 'Site', width: 'minmax(160px, 1.4fr)', mobile: 'secondary', sort: (c) => siteById(db, c.siteId)?.name ?? '', render: (c) => siteById(db, c.siteId)?.name ?? '—' },
+          { key: 'site', header: 'Site', width: 'minmax(160px, 1.4fr)', mobile: 'secondary', sort: (c) => siteById(db, c.siteId)?.name ?? '', render: (c) => <SiteLabel id={c.siteId} /> },
           { key: 'time', header: 'Time', width: '140px', mobile: 'meta', sort: (c) => c.ts, render: (c) => <span className="mono small">{fmtTime(c.ts)}</span> },
           { key: 'method', header: 'Method', width: '120px', mobile: 'meta', render: (c) => <span className="muted small">{c.method ?? 'ID only'}</span> },
           { key: 'by', header: 'Checked by', width: '140px', mobile: 'meta', render: (c) => <span className="muted">{c.by}</span> },

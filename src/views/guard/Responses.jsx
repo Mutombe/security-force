@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { ArrowRight, ChatCircleText, Eye, Plus, Scales } from '@phosphor-icons/react';
 import { useStore } from '../../store';
 import { RESPONSE_STATUS, company } from '../../access';
-import { Badge, Button, DataTable, EmptyState, Field, Menu, Modal, PageHead, fmtDate, fromNow } from '../../ui';
-import { CompanyCell, ResponseStatus } from '../../components';
+import { Badge, Button, DataTable, Drawer, EmptyState, Field, Menu, Modal, PageHead, fmtDate, fromNow } from '../../ui';
+import { CompanyCell, EntityLink, ResponseStatus } from '../../components';
 import { RespondModal, respondable, responseTarget } from '../profile/parts';
 import './guard.css';
+import '../detail/detail.css';
 
 const canEscalate = (r) => r.status === 'maintained' || (r.status === 'open' && new Date(r.dueAt) < new Date());
 
-export default function Responses() {
+export default function Responses({ id, go }) {
   const { db, session } = useStore();
   const me = session.guardId;
   const rows = db.responses.filter((r) => r.guardId === me).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -36,7 +37,7 @@ export default function Responses() {
 
       <DataTable
         rows={rows}
-        onRowClick={(r) => setModal({ k: 'view', resp: r })}
+        onRowClick={(r) => go('responses', { id: r.id })}
         columns={[
           {
             key: 'what', header: 'Responding to', width: 'minmax(220px, 2fr)', mobile: 'primary', sort: (r) => responseTarget(db, r).title,
@@ -44,7 +45,9 @@ export default function Responses() {
               const t = responseTarget(db, r);
               return (
                 <span className="cell-person-text">
-                  <span className="cell-name">{t.title}</span>
+                  <a href={`#/responses/${r.id}`} className="cell-name dt2-inline-link" onClick={(e) => e.stopPropagation()}>
+                    {t.title}
+                  </a>
                   <span className="cell-sub">{t.kind}</span>
                 </span>
               );
@@ -62,7 +65,7 @@ export default function Responses() {
             render: (r) => (
               <Menu
                 items={[
-                  { label: 'View', icon: Eye, onClick: () => setModal({ k: 'view', resp: r }) },
+                  { label: 'View', icon: Eye, onClick: () => go('responses', { id: r.id }) },
                   { label: 'Escalate to regulator', icon: Scales, disabled: !canEscalate(r), hint: canEscalate(r) ? undefined : 'Available once the employer keeps the record or misses the 14-day deadline.', onClick: () => setModal({ k: 'escalate', resp: r }) },
                 ]}
               />
@@ -74,7 +77,14 @@ export default function Responses() {
 
       {modal?.k === 'new' && <NewResponseModal options={options} onPick={(target) => setModal({ k: 'write', target })} onClose={() => setModal(null)} />}
       {modal?.k === 'write' && <RespondModal guardId={me} target={modal.target} onClose={() => setModal(null)} />}
-      {modal?.k === 'view' && <ViewModal resp={modal.resp} onEscalate={() => setModal({ k: 'escalate', resp: modal.resp })} onClose={() => setModal(null)} />}
+      {id && rows.some((r) => r.id === id) && (
+        <ResponseDetail resp={rows.find((r) => r.id === id)} onEscalate={() => setModal({ k: 'escalate', resp: rows.find((r) => r.id === id) })} onClose={() => go('responses')} />
+      )}
+      {id && !rows.some((r) => r.id === id) && (
+        <Drawer title="Response not found" backLabel="My responses" onClose={() => go('responses')}>
+          <EmptyState icon={ChatCircleText} title="Not one of your responses" body="This response may have been removed." />
+        </Drawer>
+      )}
       {modal?.k === 'escalate' && <EscalateModal resp={modal.resp} onClose={() => setModal(null)} />}
     </div>
   );
@@ -116,26 +126,38 @@ function NewResponseModal({ options, onPick, onClose }) {
   );
 }
 
-function ViewModal({ resp, onEscalate, onClose }) {
+function ResponseDetail({ resp, onEscalate, onClose }) {
   const { db } = useStore();
   const t = responseTarget(db, resp);
   return (
-    <Modal
+    <Drawer
       title={t.title}
       subtitle={`${company(db, resp.companyId).name} · ${RESPONSE_STATUS[resp.status]?.label}`}
+      backLabel="My responses"
       onClose={onClose}
+      headerExtra={<ResponseStatus resp={resp} />}
       footer={
         canEscalate(resp) ? (
           <Button icon={Scales} onClick={onEscalate}>
             Escalate to regulator
           </Button>
-        ) : (
-          <Button variant="ghost" onClick={onClose}>
-            Close
-          </Button>
-        )
+        ) : null
       }
     >
+      <div className="card">
+        <div className="row between gap-s wrap">
+          <CompanyCell id={resp.companyId} size={36} sub={`Sent ${fmtDate(resp.createdAt)}`} />
+          {resp.targetType === 'record' ? (
+            <EntityLink kind="record" id={resp.targetId} className="dt2-more">
+              View the {t.kind.toLowerCase()} record
+            </EntityLink>
+          ) : (
+            <a href="#/passport" className="dt2-more">
+              View on my passport
+            </a>
+          )}
+        </div>
+      </div>
       <div className="gd-thread">
         <div className="gd-msg mine">
           <span className="gd-msg-who">You · {fmtDate(resp.createdAt)}</span>
@@ -161,7 +183,7 @@ function ViewModal({ resp, onEscalate, onClose }) {
         )}
         {resp.status === 'open' && <p className="muted small">Waiting for {company(db, resp.companyId).name}. They are due to reply {fromNow(resp.dueAt)}.</p>}
       </div>
-    </Modal>
+    </Drawer>
   );
 }
 

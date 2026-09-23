@@ -9,19 +9,19 @@
 .pp-doc {
   position: relative; overflow: hidden; min-width: 0;
   background:
-    repeating-linear-gradient(115deg, rgba(21, 23, 28, 0.02) 0 1px, transparent 1px 7px),
-    repeating-linear-gradient(65deg, rgba(21, 23, 28, 0.015) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(115deg, var(--guilloche) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(65deg, var(--guilloche) 0 1px, transparent 1px 9px),
     var(--surface);
   border: 1px solid var(--line-2); border-radius: var(--r-lg);
   box-shadow: var(--shadow), 0 16px 36px -22px rgba(21, 23, 28, 0.35);
 }
 .pp-doc::after {
   content: 'SECURITY FORCE'; position: absolute; right: -6px; bottom: 46px; pointer-events: none;
-  font-size: 64px; font-weight: 800; letter-spacing: -0.04em; color: rgba(21, 23, 28, 0.025);
+  font-size: 64px; font-weight: 800; letter-spacing: -0.04em; color: var(--watermark);
 }
 .pp-doc-top {
   display: flex; align-items: center; gap: 12px; padding: 10px 22px;
-  background: var(--ink); color: #fff; border-bottom: 3px solid var(--hivis);
+  background: var(--band); color: #fff; border-bottom: 3px solid var(--hivis);
   font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
 }
 .pp-doc-brand { font-weight: 600; }
@@ -42,8 +42,8 @@
 .pp-verify-head { display: flex; justify-content: space-between; align-items: baseline; }
 .pp-mrz {
   position: relative; z-index: 1; padding: 12px 22px 14px; overflow: hidden;
-  background: #f1efe8; border-top: 1px solid var(--line);
-  font-family: var(--mono); font-weight: 500; font-size: 13.5px; letter-spacing: 0.16em; line-height: 1.55; color: #474c58; white-space: pre;
+  background: var(--mrz-bg); border-top: 1px solid var(--line);
+  font-family: var(--mono); font-weight: 500; font-size: 13.5px; letter-spacing: 0.16em; line-height: 1.55; color: var(--mrz-ink); white-space: pre;
 }
 
 .pp-kv { display: flex; flex-direction: column; gap: 10px; }
@@ -57,7 +57,7 @@
 
 .pp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .pp-actions-note { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; font-size: 12.5px; color: var(--muted); }
-.pp-actor-icon { display: inline-grid; place-items: center; flex-shrink: 0; border-radius: 8px; background: var(--ink); color: #fff; }
+.pp-actor-icon { display: inline-grid; place-items: center; flex-shrink: 0; border-radius: 8px; background: var(--ink); color: var(--on-ink); }
 .pp-lede { max-width: 680px; }
 
 /* career summary */
@@ -91,19 +91,19 @@
 .pp-record.is-retracted { background: var(--surface-2); }
 .pp-record.is-retracted .pp-record-title { text-decoration: line-through; color: var(--muted); }
 .pp-locked { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--surface-2); border: 1px dashed var(--line-2); border-radius: var(--r-lg); }
-.pp-response { margin-top: 12px; padding: 12px 14px; background: var(--warn-bg); border-radius: var(--r-sm); font-size: 13.5px; color: #4a3610; }
+.pp-response { margin-top: 12px; padding: 12px 14px; background: var(--warn-bg); border-radius: var(--r-sm); font-size: 13.5px; color: var(--warn-ink); }
 .pp-response-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
 .pp-response-head > span { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; }
-.pp-response .badge { background: rgba(255, 255, 255, 0.75); }
-.pp-response-note { margin-top: 8px; font-size: 12.5px; color: #6b5324; }
+.pp-response .badge { background: var(--chip-glass); }
+.pp-response-note { margin-top: 8px; font-size: 12.5px; color: var(--warn-ink-2); }
 
 /* training */
 .pp-certs { display: flex; flex-direction: column; }
 .pp-certs li { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
 .pp-certs li:last-child { border-bottom: 0; }
 .pp-licence { padding: 16px; border-radius: var(--r); background: var(--surface-2); border: 1px solid var(--line); }
-.pp-licence.tone-bad { background: var(--bad-bg); border-color: #efc9c4; }
-.pp-licence.tone-warn { background: var(--warn-bg); border-color: #efdcb0; }
+.pp-licence.tone-bad { background: var(--bad-bg); border-color: var(--bad-line); }
+.pp-licence.tone-warn { background: var(--warn-bg); border-color: var(--warn-line); }
 .pp-licence-no { margin-top: 4px; font-size: 22px; font-weight: 600; letter-spacing: 0.04em; }
 
 /* activity timeline (shared with guard access log) */

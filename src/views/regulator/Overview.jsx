@@ -3,9 +3,10 @@ import { ArrowRight, Buildings, Clock, ClockCounterClockwise, Handshake, Identif
 import { useStore } from '../../store';
 import { activeEmployments, company, companyReputation, complianceIssues, guardById } from '../../access';
 import { Badge, Button, Card, DataTable, EmptyState, OrgMark, PageHead, Stat, fmtDate, fromNow } from '../../ui';
-import { CompanyCell, GuardCell } from '../../components';
+import { CompanyCell, GuardCell, EntityLink } from '../../components';
 import { targetOf } from '../trust/shared';
 import './regulator.css';
+import '../detail/detail.css';
 
 export const STATUS = { active: ['ok', 'Active'], pending: ['warn', 'Awaiting approval'], suspended: ['bad', 'Suspended'] };
 
@@ -88,7 +89,7 @@ export default function Overview({ go }) {
                 <li key={c.id} className="tap" onClick={() => go('companies', { id: c.id })}>
                   <OrgMark company={c} size={32} />
                   <span className="grow">
-                    <span className="item-title">{c.name}</span>
+                    <span className="item-title"><EntityLink kind="company" id={c.id} className="dt2-inline-link">{c.name}</EntityLink></span>
                     <span className="item-sub mono">{c.reg}</span>
                   </span>
                   <Badge tone="warn">Review</Badge>
@@ -106,9 +107,9 @@ export default function Overview({ go }) {
                 <li key={r.id}>
                   <OrgMark company={company(db, r.toCompanyId)} size={32} />
                   <span className="grow">
-                    <span className="item-title">{company(db, r.toCompanyId).name}</span>
+                    <span className="item-title"><EntityLink kind="company" id={r.toCompanyId} className="dt2-inline-link">{company(db, r.toCompanyId).name}</EntityLink></span>
                     <span className="item-sub">
-                      About {guardById(db, r.guardId).name} · due {fmtDate(r.dueAt)}
+                      About <EntityLink kind="guard" id={r.guardId} className="dt2-inline-link">{guardById(db, r.guardId).name}</EntityLink> · due {fmtDate(r.dueAt)}
                     </span>
                   </span>
                   <Badge tone="bad">{fromNow(r.dueAt).replace(' ago', '')} late</Badge>

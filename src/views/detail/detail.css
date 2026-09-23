@@ -1,0 +1,79 @@
+/* Detail pages (company profile, record, team member, client site).
+   Theme variables only — no hard-coded colours, so light and dark themes both work. */
+
+.dt2-hero { display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+.dt2-hero-main { flex: 1; min-width: 220px; }
+.dt2-hero-main h1, .dt2-h2 { font-size: 26px; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.dt2-hero-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.dt2-contact { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px 20px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.dt2-contact dt { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--faint); }
+.dt2-contact dd { margin-top: 3px; font-size: 14px; color: var(--ink); overflow-wrap: anywhere; }
+
+.dt2-standing { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.dt2-standing > div { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-right: 1px solid var(--line); min-width: 0; }
+.dt2-standing > div:last-child { border-right: 0; }
+.dt2-k { font-size: 12.5px; color: var(--muted); }
+.dt2-v { font-size: 24px; font-weight: 600; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--ink); }
+.dt2-v.is-bad { color: var(--bad); }
+
+.dt2-req { display: flex; flex-direction: column; min-width: 0; }
+.dt2-req .entity-link { font-weight: 500; }
+
+.dt2-record-hero { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.dt2-record-hero.is-retracted .dt2-record-title { text-decoration: line-through; color: var(--muted); }
+.dt2-record-icon { width: 52px; height: 52px; border-radius: 14px; }
+.dt2-record-title { font-size: 24px; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.dt2-record-hero .grow { min-width: 220px; }
+
+.dt2-prose { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; }
+.dt2-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px 20px; margin-top: 16px; }
+.dt2-facts > div { min-width: 0; }
+.dt2-facts dt { font-size: 11.5px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--faint); }
+.dt2-facts dd { margin-top: 3px; font-size: 14px; color: var(--ink); overflow-wrap: anywhere; }
+.card .dt2-facts:first-child { margin-top: 0; }
+
+.dt2-response { display: flex; flex-direction: column; gap: 10px; padding: 14px; background: var(--warn-bg); border-radius: var(--r-sm); }
+.dt2-response .dt2-prose { color: var(--ink); }
+.dt2-note { font-size: 13px; color: var(--ink-2); padding-top: 8px; border-top: 1px solid var(--line); }
+.dt2-more { display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; font-size: 13px; font-weight: 500; color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 3px; }
+.dt2-more:hover { text-decoration-color: var(--ink); }
+
+.dt2-title-link { color: inherit; text-decoration: none; }
+.dt2-title-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.dt2-cov { margin-bottom: 14px; }
+.dt2-cov .meter-bar { width: 160px; }
+
+/* Plain-text entities that became links keep the surrounding text style. */
+.dt2-inline-link { color: inherit; font-weight: inherit; text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 3px; }
+.dt2-inline-link:hover { text-decoration-color: var(--ink); }
+.dt2-card-link { color: inherit; text-decoration: none; }
+.dt2-card-link:hover .item-title, .dt2-card-link:hover .dt2-link-title { text-decoration: underline; text-underline-offset: 3px; }
+
+@media (max-width: 860px) {
+  .dt2-hero { gap: 14px; }
+  .dt2-hero-main h1, .dt2-h2 { font-size: 22px; }
+  .dt2-hero-actions { width: 100%; }
+  .dt2-hero-actions > .btn { flex: 1; }
+  .dt2-standing { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dt2-standing > div:nth-child(2n) { border-right: 0; }
+  .dt2-standing > div:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
+  .dt2-contact { grid-template-columns: minmax(0, 1fr); }
+  .dt2-record-title { font-size: 20px; }
+  .dt2-record-icon { width: 44px; height: 44px; }
+  .dt2-cov .meter-bar { width: 110px; }
+}
+
+/* Rows that used to be buttons and are now real links */
+a.dt2-row-link { color: inherit; text-decoration: none; }
+a.dt2-row-link:hover b, a.dt2-row-link:hover > span:first-child { text-decoration: underline; text-underline-offset: 3px; }
+a.dt2-card-link { color: var(--ink); text-decoration: none; }
+a.dt2-card-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Guard rows with a badge and an action: stack the actions under the name on phones */
+@media (max-width: 860px) {
+  .dt2-duty > li { flex-wrap: wrap; row-gap: 10px; }
+  .dt2-duty > li > .cell-person { flex: 1 1 100%; }
+  .dt2-duty > li > .grow { display: none; }
+  .dt2-duty > li > .btn { margin-left: auto; }
+}

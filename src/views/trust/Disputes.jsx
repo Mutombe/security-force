@@ -3,9 +3,10 @@ import { ArrowRight, ChatCircleText, CheckCircle, PencilSimple, Scales, ShieldCh
 import { useStore } from '../../store';
 import { RECORD_TYPES, deniedHint, guardById } from '../../access';
 import { Badge, Button, DataTable, Drawer, EmptyState, Field, Menu, Modal, PageHead, SearchInput, Segmented, Tabs, daysUntil, fmtDate, fromNow, hoursUntil } from '../../ui';
-import { GuardCell, PermissionNote, ResponseStatus } from '../../components';
+import { GuardCell, PermissionNote, ResponseStatus, EntityLink } from '../../components';
 import { TargetSummary, Timeline, firstName, targetOf } from './shared';
 import './trust.css';
+import '../detail/detail.css';
 
 const RESOLVED = ['maintained', 'amended', 'escalated', 'upheld', 'overturned'];
 
@@ -155,7 +156,7 @@ function ResponseDrawer({ resp, onClose, go }) {
     >
       <section className="tr-section">
         <div className="tr-section-title">Guard</div>
-        <GuardCell guard={g} size={42} onClick={() => go('guard', { id: g.id })} />
+        <GuardCell guard={g} size={42} />
       </section>
       <section className="tr-section">
         <div className="tr-section-title">Original entry</div>
@@ -166,7 +167,7 @@ function ResponseDrawer({ resp, onClose, go }) {
         <div className="tr-voice">
           <div className="tr-voice-head">
             <span>
-              <ChatCircleText size={14} /> {g.name}
+              <ChatCircleText size={14} /> <EntityLink kind="guard" id={g.id} className="dt2-inline-link">{g.name}</EntityLink>
             </span>
             <span className="mono">{fmtDate(resp.createdAt)}</span>
           </div>

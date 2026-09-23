@@ -4,6 +4,7 @@ import { ChatCircleText, Plugs, Scales } from '@phosphor-icons/react';
 import { useStore } from '../../store';
 import { RECORD_TYPES, company, guardById } from '../../access';
 import { Avatar, Button, EmptyState, Field, Modal, OrgMark, addDays, fmtClock, fmtDate } from '../../ui';
+import { EntityLink } from '../../components';
 
 // Two-line machine-readable zone, like the bottom of a travel document.
 export function mrz(guard, pii) {
@@ -150,11 +151,31 @@ export function ActivityTimeline({ entries, empty = 'No activity yet.' }) {
                 <ActorMark entry={a} />
                 <div className="grow">
                   <div className="pp-activity-line">
-                    <b>{a.actor}</b>
+                    <b>
+                      {a.actorRole === 'staff' || a.actorRole === 'integration' ? (
+                        <EntityLink kind="company" id={a.actorId} className="dt2-inline-link">
+                          {a.actor}
+                        </EntityLink>
+                      ) : a.actorRole === 'guard' ? (
+                        <EntityLink kind="guard" id={a.actorId} className="dt2-inline-link">
+                          {a.actor}
+                        </EntityLink>
+                      ) : (
+                        a.actor
+                      )}
+                    </b>
                     {a.actorUser && a.actorUser !== a.actor && <span className="muted"> · {a.actorUser}</span>}
                     <span className="pp-activity-action"> {a.action.toLowerCase()}</span>
                   </div>
-                  <div className="pp-activity-detail">{a.detail}</div>
+                  <div className="pp-activity-detail">
+                    {a.guardId && a.actorRole !== 'guard' ? (
+                      <EntityLink kind="guard" id={a.guardId} className="dt2-inline-link">
+                        {a.detail}
+                      </EntityLink>
+                    ) : (
+                      a.detail
+                    )}
+                  </div>
                 </div>
                 <time className="pp-activity-time">{fmtClock(a.ts)}</time>
               </li>

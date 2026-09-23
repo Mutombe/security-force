@@ -4,6 +4,7 @@ import { useStore } from '../../store';
 import { company, currentEmployment, guardById, licenceStatus, siteById } from '../../access';
 import { Avatar, Badge, Button, Card, Field, OrgMark, PageHead, badgeCode, badgeSecondsLeft, checkBadgeCode, fmtDate, fmtTime, sleep, uid, useNow } from '../../ui';
 import { OtpInput } from '../../auth';
+import { CompanyCell, EntityLink, SiteLabel } from '../../components';
 import { RESULTS, normaliseWid } from './results';
 import './client.css';
 
@@ -147,7 +148,7 @@ export default function ClientVerify({ id }) {
                   <dl className="cl-facts">
                     <div>
                       <dt>Employer</dt>
-                      <dd>{co ? co.name : 'None in network'}</dd>
+                      <dd>{co ? <CompanyCell company={co} size={24} sub={false} /> : 'None in network'}</dd>
                     </div>
                     <div>
                       <dt>Role</dt>
@@ -155,7 +156,7 @@ export default function ClientVerify({ id }) {
                     </div>
                     <div>
                       <dt>Rostered at</dt>
-                      <dd>{result.cur ? (result.cur.siteId === result.site?.id ? result.site.name : sites.some((s) => s.id === result.cur.siteId) ? siteById(db, result.cur.siteId).name : 'Another site') : '—'}</dd>
+                      <dd>{result.cur ? (result.cur.siteId === result.site?.id || sites.some((s) => s.id === result.cur.siteId) ? <SiteLabel id={result.cur.siteId} /> : 'Another site') : '—'}</dd>
                     </div>
                     <div>
                       <dt>Licence</dt>
@@ -182,7 +183,16 @@ export default function ClientVerify({ id }) {
                 <div className="cl-result-call">
                   <OrgMark company={siteCo} size={28} />
                   <span className="grow">
-                    Your contractor for {result.site.name}: <b>{siteCo.name}</b>
+                    Your contractor for{' '}
+                    <EntityLink kind="site" id={result.site.id} className="dt2-inline-link">
+                      {result.site.name}
+                    </EntityLink>
+                    :{' '}
+                    <b>
+                      <EntityLink kind="company" id={siteCo.id} className="dt2-inline-link">
+                        {siteCo.name}
+                      </EntityLink>
+                    </b>
                   </span>
                   <a className="btn btn-ghost btn-sm" href={`tel:${siteCo.phone.replace(/\s/g, '')}`}>
                     <Phone size={15} /> {siteCo.phone}
@@ -209,9 +219,20 @@ export default function ClientVerify({ id }) {
                       <li key={c.id}>
                         {g ? <Avatar name={g.name} seed={g.id} src={g.avatar} size={34} /> : <span className="item-icon"><ShieldWarning size={16} /></span>}
                         <div className="grow">
-                          <div className="item-title">{g ? g.name : <span className="mono">{c.input}</span>}</div>
+                          <div className="item-title">
+                            {g ? (
+                              <EntityLink kind="guard" id={g.id} className="dt2-inline-link">
+                                {g.name}
+                              </EntityLink>
+                            ) : (
+                              <span className="mono">{c.input}</span>
+                            )}
+                          </div>
                           <div className="item-sub">
-                            {siteById(db, c.siteId)?.name} · {fmtTime(c.ts)}
+                            <EntityLink kind="site" id={c.siteId} className="dt2-inline-link">
+                              {siteById(db, c.siteId)?.name}
+                            </EntityLink>{' '}
+                            · {fmtTime(c.ts)}
                           </div>
                         </div>
                         <Badge tone={RESULTS[c.result]?.tone ?? 'neutral'} dot>

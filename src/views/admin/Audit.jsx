@@ -3,7 +3,9 @@ import { ClockCounterClockwise, DownloadSimple, LockKey } from '@phosphor-icons/
 import { useStore } from '../../store';
 import { deniedHint } from '../../access';
 import { Avatar, Button, DataTable, EmptyState, FilterSelect, PageHead, SearchInput, downloadCSV, fmtTime, fromNow } from '../../ui';
+import { EntityLink } from '../../components';
 import './admin.css';
+import '../detail/detail.css';
 
 const RANGES = { '': null, '24h': 1, '7d': 7, '30d': 30 };
 const ROLE_LABEL = { staff: 'Company staff', guard: 'Guard', client: 'Client', regulator: 'Regulator', integration: 'Integration', system: 'System' };
@@ -66,8 +68,28 @@ export default function Audit({ go }) {
           <span className="cell-person">
             <Avatar name={a.actorUser || a.actor} seed={p?.id} src={p?.avatar} size={30} />
             <span className="cell-person-text">
-              <span className="cell-name">{a.actorUser || a.actor}</span>
-              <span className="cell-sub">{a.actorUser && a.actorUser !== a.actor ? a.actor : ROLE_LABEL[a.actorRole] ?? a.actorRole}</span>
+              {a.actorRole === 'guard' ? (
+                <EntityLink kind="guard" id={a.actorId} className="cell-name dt2-card-link">
+                  {a.actor}
+                </EntityLink>
+              ) : a.actorRole === 'staff' && p && !regulator ? (
+                <EntityLink kind="user" id={p.id} className="cell-name dt2-card-link">
+                  {a.actorUser}
+                </EntityLink>
+              ) : (
+                <span className="cell-name">{a.actorUser || a.actor}</span>
+              )}
+              <span className="cell-sub">
+                {a.actorRole === 'staff' || a.actorRole === 'integration' ? (
+                  <EntityLink kind="company" id={a.actorId} className="dt2-inline-link">
+                    {a.actor}
+                  </EntityLink>
+                ) : a.actorUser && a.actorUser !== a.actor ? (
+                  a.actor
+                ) : (
+                  ROLE_LABEL[a.actorRole] ?? a.actorRole
+                )}
+              </span>
             </span>
           </span>
         );
@@ -81,9 +103,9 @@ export default function Audit({ go }) {
       mobile: 'secondary',
       render: (a) =>
         a.guardId && openable ? (
-          <button type="button" className="link-btn ad-detail" onClick={(e) => { e.stopPropagation(); go('guard', { id: a.guardId }); }}>
+          <EntityLink kind="guard" id={a.guardId} className="link-btn ad-detail">
             {a.detail}
-          </button>
+          </EntityLink>
         ) : (
           <span className="ad-detail">{a.detail}</span>
         ),

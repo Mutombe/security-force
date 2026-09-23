@@ -41,6 +41,8 @@ Company logos live in `public/logos/` and the Security Force brand marks in `pub
   - A log of who looked at their record.
 - **Clients:** their sites and expected guards, a gate check using Workforce ID, live code and site, and check history.
 - **Regulator:** network oversight, company approval and suspension, rulings on escalated disputes, the registry, and the full audit trail.
+- **Detail pages for everything:** guards, companies, sites, records, verification requests, guard responses, applicants and team members each have their own page and URL. Names are real links throughout the app, so they open in a new tab too.
+- **Appearance:** light and dark themes. The default follows the device; override it under the account menu (or the header toggle on the landing page).
 - **Across the app**
   - Command palette (Ctrl/Cmd+K) and a notification centre.
   - Skeleton loading screens.

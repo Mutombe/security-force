@@ -5,60 +5,130 @@ import { useStore } from './store';
 import { REQUEST_STATUS, RESPONSE_STATUS, company, coverage, expiryStatus, guardById, licenceStatus, siteById, slaStatus } from './access';
 import { Avatar, Badge, Button, OrgMark, fileToLogo, fmtDate } from './ui';
 
-/** Avatar + name + Workforce ID. Pass `guard` or `id`. */
-export function GuardCell({ guard, id, size = 34, sub, onClick }) {
-  const { db } = useStore();
+/*
+  LINKS — every item in the app links to its detail page.
+    hrefFor(db, session, kind, id) → '#/…' or null when this viewer has no page for it
+    <EntityLink kind id>text</EntityLink>  real <a href> (works with middle-click / new tab)
+  kinds: guard · company · site · user · request · record · applicant · response · client
+*/
+export function hrefFor(db, session, kind, id) {
+  if (!session || !id) return null;
+  const k = session.kind;
+  switch (kind) {
+    case 'guard':
+      if (k === 'guard') return id === session.guardId ? '#/passport' : null;
+      if (k === 'client') return `#/verify/${id}`;
+      return `#/guard/${id}`;
+    case 'company':
+      return k === 'regulator' ? `#/companies/${id}` : `#/company/${id}`;
+    case 'site': {
+      const s = siteById(db, id);
+      if (!s) return null;
+      if (k === 'staff' && s.companyId === session.companyId) return `#/sites/${id}`;
+      if (k === 'client' && s.clientId === session.clientId) return `#/sites/${id}`;
+      return null;
+    }
+    case 'user':
+      return k === 'staff' && db.users.find((u) => u.id === id)?.memberships?.some((m) => m.companyId === session.companyId) ? `#/team/${id}` : null;
+    case 'request': {
+      const r = db.requests.find((x) => x.id === id);
+      if (!r) return null;
+      if (k === 'staff' && (r.fromCompanyId === session.companyId || r.toCompanyId === session.companyId)) return `#/verification/${id}`;
+      if (k === 'guard' && r.guardId === session.guardId) return '#/consents';
+      return null;
+    }
+    case 'record':
+      return k === 'client' ? null : `#/record/${id}`;
+    case 'applicant':
+      return k === 'staff' ? `#/recruitment/${id}` : null;
+    case 'response':
+      if (k === 'staff') return `#/disputes/${id}`;
+      if (k === 'regulator') return `#/escalations/${id}`;
+      if (k === 'guard') return `#/responses/${id}`;
+      return null;
+    default:
+      return null;
+  }
+}
+
+export function EntityLink({ kind, id, children, className = '' }) {
+  const { db, session } = useStore();
+  const href = hrefFor(db, session, kind, id);
+  if (!href) return <span className={className}>{children}</span>;
+  return (
+    <a href={href} className={`entity-link ${className}`} onClick={(e) => e.stopPropagation()}>
+      {children}
+    </a>
+  );
+}
+
+function CellShell({ href, children }) {
+  return href ? (
+    <a href={href} className="cell-person is-link" onClick={(e) => e.stopPropagation()}>
+      {children}
+    </a>
+  ) : (
+    <span className="cell-person">{children}</span>
+  );
+}
+
+/** Avatar + name + Workforce ID, linked to the guard's page. Pass `guard` or `id`. */
+export function GuardCell({ guard, id, size = 34, sub, link = true }) {
+  const { db, session } = useStore();
   const g = guard ?? guardById(db, id);
   if (!g) return <span className="muted">Unknown</span>;
   return (
-    <span className={`cell-person ${onClick ? 'is-link' : ''}`} onClick={onClick}>
+    <CellShell href={link ? hrefFor(db, session, 'guard', g.id) : null}>
       <Avatar name={g.name} seed={g.id} src={g.avatar} size={size} />
       <span className="cell-person-text">
         <span className="cell-name">{g.name}</span>
         <span className="cell-sub">{sub ?? <span className="mono">{g.id}</span>}</span>
       </span>
-    </span>
+    </CellShell>
   );
 }
 
-export function UserCell({ user, size = 34, sub }) {
+export function UserCell({ user, size = 34, sub, link = true }) {
+  const { db, session } = useStore();
   if (!user) return null;
   return (
-    <span className="cell-person">
+    <CellShell href={link ? hrefFor(db, session, 'user', user.id) : null}>
       <Avatar name={user.name} seed={user.id} src={user.avatar} size={size} />
       <span className="cell-person-text">
         <span className="cell-name">{user.name}</span>
         <span className="cell-sub">{sub ?? user.email}</span>
       </span>
-    </span>
+    </CellShell>
   );
 }
 
-export function CompanyCell({ id, company: c, size = 28, sub }) {
-  const { db } = useStore();
+export function CompanyCell({ id, company: c, size = 28, sub, link = true }) {
+  const { db, session } = useStore();
   const co = c ?? company(db, id);
   if (!co) return <span className="muted">—</span>;
   return (
-    <span className="cell-person">
+    <CellShell href={link ? hrefFor(db, session, 'company', co.id) : null}>
       <OrgMark company={co} size={size} />
       <span className="cell-person-text">
         <span className="cell-name">{co.name}</span>
         {sub !== false && <span className="cell-sub">{sub ?? co.city}</span>}
       </span>
-    </span>
+    </CellShell>
   );
 }
 
-export function SiteLabel({ id, withRisk }) {
-  const { db } = useStore();
+export function SiteLabel({ id, withRisk, link = true }) {
+  const { db, session } = useStore();
   const s = siteById(db, id);
   if (!s) return <span className="muted">Unassigned</span>;
+  const href = link ? hrefFor(db, session, 'site', id) : null;
+  const Tag = href ? 'a' : 'span';
   return (
-    <span className="site-label">
+    <Tag className={`site-label ${href ? 'is-link' : ''}`} href={href ?? undefined} onClick={href ? (e) => e.stopPropagation() : undefined}>
       <MapPin size={13} />
       <span>{s.name}</span>
       {withRisk && s.risk !== 'Standard' && <RiskBadge risk={s.risk} />}
-    </span>
+    </Tag>
   );
 }
 

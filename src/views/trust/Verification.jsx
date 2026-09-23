@@ -11,10 +11,11 @@ import {
   Badge, Button, ConfirmModal, DataTable, Drawer, EmptyState, Field, FilterSelect, Menu, Modal, PageHead, SearchInput, Segmented, Tabs,
   addDays, daysUntil, fmtDate, fmtMonth, fromNow, hoursUntil,
 } from '../../ui';
-import { CompanyCell, GuardCell, PermissionNote, RequestStatus, SlaBadge } from '../../components';
+import { CompanyCell, GuardCell, PermissionNote, RequestStatus, SlaBadge, EntityLink } from '../../components';
 import { RequestVerificationModal } from '../../modals';
 import { Timeline, firstName } from './shared';
 import './trust.css';
+import '../detail/detail.css';
 
 const OPEN = ['pending', 'awaiting_consent'];
 const CLOSED = ['approved', 'declined', 'withdrawn', 'expired'];
@@ -593,7 +594,7 @@ function RequestDrawer({ req, onClose, go }) {
 
       <section className="tr-section">
         <div className="tr-section-title">About</div>
-        <GuardCell guard={g} size={42} sub={`${g.id} · ${cur ? `${cur.position}, ${company(db, cur.companyId).name}` : 'Not currently employed'}`} onClick={() => go('guard', { id: g.id })} />
+        <GuardCell guard={g} size={42} sub={`${g.id} · ${cur ? `${cur.position}, ${company(db, cur.companyId).name}` : 'Not currently employed'}`} />
         {req.purpose && <p className="tr-purpose">{req.purpose}</p>}
       </section>
 

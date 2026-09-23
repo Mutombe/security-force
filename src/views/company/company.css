@@ -19,7 +19,7 @@
 .co-bar { position: relative; height: 8px; background: var(--sunk-2); border-radius: 4px; overflow: hidden; }
 .co-bar > span { position: absolute; inset: 0 auto 0 0; border-radius: 4px; transition: width 0.4s var(--ease); }
 .co-bar.ok > span { background: var(--ok); }
-.co-bar.warn > span { background: #c98a1b; }
+.co-bar.warn > span { background: var(--meter-warn); }
 .co-bar.bad > span { background: var(--bad); }
 .co-bar-lg { height: 10px; }
 .co-posts { display: flex; gap: 4px; }
@@ -68,7 +68,7 @@
 .co-site { display: flex; flex-direction: column; gap: 14px; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow); text-align: left; cursor: pointer; transition: border-color 0.12s, box-shadow 0.12s; min-width: 0; }
 .co-site:hover { border-color: var(--line-2); box-shadow: var(--shadow-md); }
 .co-site.is-inactive { opacity: 0.6; }
-.co-site.is-critical-gap { border-color: #ecc8c4; box-shadow: 0 0 0 1px #ecc8c4, var(--shadow); }
+.co-site.is-critical-gap { border-color: var(--bad-line); box-shadow: 0 0 0 1px var(--bad-line), var(--shadow); }
 .co-site-top { display: flex; align-items: flex-start; gap: 10px; }
 .co-site-name { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
 .co-site-client { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
@@ -92,7 +92,7 @@
 /* recruitment */
 .co-board { display: grid; grid-template-columns: repeat(6, minmax(220px, 1fr)); gap: 12px; overflow-x: auto; padding-bottom: 6px; align-items: start; }
 .co-lane { display: flex; flex-direction: column; min-height: 320px; background: var(--sunk); border-radius: var(--r-lg); padding: 8px; transition: background 0.12s, box-shadow 0.12s; }
-.co-lane.is-over { background: #efe7da; box-shadow: inset 0 0 0 2px var(--ink); }
+.co-lane.is-over { background: var(--lane-over); box-shadow: inset 0 0 0 2px var(--ink); }
 .co-lane-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 6px 10px; font-size: 13px; font-weight: 600; }
 .co-lane-head .count { background: var(--surface); }
 .co-lane-body { display: flex; flex-direction: column; gap: 8px; flex: 1; }

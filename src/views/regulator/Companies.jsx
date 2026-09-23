@@ -3,9 +3,10 @@ import { ArrowCounterClockwise, Buildings, CheckCircle, Envelope, MapPin, Phone,
 import { useStore } from '../../store';
 import { company, companyMembers, complianceIssues, expiryStatus } from '../../access';
 import { Badge, Button, ConfirmModal, DataTable, Drawer, EmptyState, Field, FilterSelect, Modal, OrgMark, PageHead, SearchInput, fmtDate, fromNow } from '../../ui';
-import { CompanyCell } from '../../components';
+import { CompanyCell, EntityLink } from '../../components';
 import { STATUS, companyMetrics } from './Overview';
 import './regulator.css';
+import '../detail/detail.css';
 
 export default function Companies({ go, id }) {
   const { db } = useStore();
@@ -161,7 +162,7 @@ function CompanyDrawer({ co, onClose, go }) {
                   <Warning size={16} />
                 </span>
                 <span className="grow">
-                  <span className="item-title">{i.guard.name}</span>
+                  <span className="item-title"><EntityLink kind="guard" id={i.guard.id} className="dt2-inline-link">{i.guard.name}</EntityLink></span>
                   <span className="item-sub">{i.label}</span>
                 </span>
               </li>

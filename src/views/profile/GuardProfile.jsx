@@ -12,10 +12,11 @@ import {
   Avatar, Badge, Button, Card, Check, ConfirmModal, EmptyState, Locked, Menu, Meter, NavTabs, OrgMark, daysUntil, fmtDate, fmtMonth,
   fromNow, useIsMobile,
 } from '../../ui';
-import { CompanyCell, ExpiryBadge, LicenceBadge, ResponseStatus, SiteLabel } from '../../components';
+import { CompanyCell, EntityLink, ExpiryBadge, LicenceBadge, ResponseStatus, SiteLabel } from '../../components';
 import { AssignSiteModal, AttendanceModal, EditGuardModal, HireModal, RecordModal, RequestVerificationModal, SeparationModal } from '../../modals';
 import { ActivityTimeline, RespondModal, monthsBetween, mrz } from './parts';
 import './profile.css';
+import '../detail/detail.css';
 
 export default function GuardProfile({ id, go, self }) {
   const { db, session, can, act, mutate } = useStore();
@@ -241,7 +242,7 @@ export default function GuardProfile({ id, go, self }) {
               </li>
               {certIssues.map((r) => (
                 <li key={r.id}>
-                  <span className="clamp-1">{r.title}</span>
+                  <span className="clamp-1"><EntityLink kind="record" id={r.id} className="dt2-inline-link">{r.title}</EntityLink></span>
                   <ExpiryBadge iso={r.expires} />
                 </li>
               ))}
@@ -314,7 +315,7 @@ export default function GuardProfile({ id, go, self }) {
                       <OrgMark company={co} size={34} />
                       <div className="grow">
                         <b>{e.position}</b>
-                        <span className="muted"> · {co.name}</span>
+                        <span className="muted"> · <EntityLink kind="company" id={co.id} className="dt2-inline-link">{co.name}</EntityLink></span>
                       </div>
                       <span className="pp-dates">
                         {fmtMonth(e.start)} – {fmtMonth(e.end)}
@@ -334,8 +335,13 @@ export default function GuardProfile({ id, go, self }) {
                         <ChatCircleText size={17} />
                       </span>
                       <div className="grow">
-                        <div className="item-title">{company(db, r.companyId).name}</div>
+                        <div className="item-title"><EntityLink kind="company" id={r.companyId} className="dt2-inline-link">{company(db, r.companyId).name}</EntityLink></div>
                         <p className="item-sub clamp-2">{r.text}</p>
+                        {r.targetType === 'record' && (
+                          <EntityLink kind="record" id={r.targetId} className="dt2-more">
+                            View the record
+                          </EntityLink>
+                        )}
                       </div>
                       <ResponseStatus resp={r} />
                     </li>
@@ -376,7 +382,7 @@ export default function GuardProfile({ id, go, self }) {
                     <div className="pp-tl-head">
                       <div className="grow">
                         <div className="pp-tl-title">{e.position}</div>
-                        <div className="pp-tl-sub">{co.name}</div>
+                        <div className="pp-tl-sub"><EntityLink kind="company" id={co.id} className="dt2-inline-link">{co.name}</EntityLink></div>
                       </div>
                       <div className="pp-tl-date">
                         <span className="mono">
@@ -390,7 +396,11 @@ export default function GuardProfile({ id, go, self }) {
                         Verified by employer
                       </Badge>
                       {own && e.siteId && (
-                        <Badge icon={MapPin}>{siteById(db, e.siteId)?.name}</Badge>
+                        <Badge icon={MapPin}>
+                          <EntityLink kind="site" id={e.siteId} className="dt2-inline-link">
+                            {siteById(db, e.siteId)?.name}
+                          </EntityLink>
+                        </Badge>
                       )}
                       {attVisible ? <Badge tone={e.attendance >= 90 ? 'ok' : e.attendance >= 80 ? 'warn' : 'bad'}>Attendance {e.attendance}%</Badge> : <Locked>Attendance</Locked>}
                       {e.end &&
@@ -455,10 +465,10 @@ export default function GuardProfile({ id, go, self }) {
                     <Warning size={17} />
                   </span>
                   <div className="grow">
-                    <div className="pp-record-title">{r.title}</div>
+                    <div className="pp-record-title"><EntityLink kind="record" id={r.id} className="dt2-inline-link">{r.title}</EntityLink></div>
                     <div className="item-sub">
                       {t.short}
-                      {r.severity && ` · ${r.severity}`} · {fmtDate(r.date)} · {company(db, r.companyId).name}
+                      {r.severity && ` · ${r.severity}`} · {fmtDate(r.date)} · <EntityLink kind="company" id={r.companyId} className="dt2-inline-link">{company(db, r.companyId).name}</EntityLink>
                     </div>
                   </div>
                   {owner && !r.retracted && (
@@ -495,7 +505,7 @@ export default function GuardProfile({ id, go, self }) {
                 <LockSimple size={17} />
               </span>
               <div className="grow">
-                <div className="item-title">{company(db, cid).name}</div>
+                <div className="item-title"><EntityLink kind="company" id={cid} className="dt2-inline-link">{company(db, cid).name}</EntityLink></div>
                 <div className="item-sub">Records from this employer are released only with the guard's consent.</div>
               </div>
               <Button variant="ghost" size="sm" disabledReason={myCo.status !== 'active' ? 'Available once the regulator approves your company.' : deniedHint(session, 'verification.request')} onClick={() => setModal({ k: 'request', to: cid })}>
@@ -516,9 +526,9 @@ export default function GuardProfile({ id, go, self }) {
                     <GraduationCap size={17} />
                   </span>
                   <div className="grow">
-                    <div className="item-title">{r.title}</div>
+                    <div className="item-title"><EntityLink kind="record" id={r.id} className="dt2-inline-link">{r.title}</EntityLink></div>
                     <div className="item-sub">
-                      {fmtDate(r.date)} · {company(db, r.companyId).name}
+                      {fmtDate(r.date)} · <EntityLink kind="company" id={r.companyId} className="dt2-inline-link">{company(db, r.companyId).name}</EntityLink>
                       {r.evidence && ` · ${r.evidence}`}
                     </div>
                   </div>
@@ -585,9 +595,9 @@ function RecordList({ items, empty }) {
             {r.type === 'commendation' ? <Medal size={16} /> : <GraduationCap size={16} />}
           </span>
           <div className="grow">
-            <div className="item-title">{r.title}</div>
+            <div className="item-title"><EntityLink kind="record" id={r.id} className="dt2-inline-link">{r.title}</EntityLink></div>
             <div className="item-sub">
-              {fmtDate(r.date)} · {company(db, r.companyId).name}
+              {fmtDate(r.date)} · <EntityLink kind="company" id={r.companyId} className="dt2-inline-link">{company(db, r.companyId).name}</EntityLink>
             </div>
           </div>
           {r.expires && <ExpiryBadge iso={r.expires} />}

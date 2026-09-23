@@ -10,9 +10,10 @@ import {
   Avatar, Badge, Button, ConfirmModal, DataTable, Drawer, EmptyState, Field, FilterSelect, Menu, Modal, PageHead, SearchInput,
   Segmented, Tabs, daysUntil, fmtDate, fmtMonth, fromNow, parseCSV, plural, uid, useIsMobile,
 } from '../../ui';
-import { CompanyCell, GuardCell, LicenceBadge, SiteLabel, SlaBadge } from '../../components';
+import { CompanyCell, GuardCell, LicenceBadge, SiteLabel, SlaBadge, EntityLink } from '../../components';
 import { HireModal, RequestVerificationModal } from '../../modals';
 import './company.css';
+import '../detail/detail.css';
 
 const OPEN = ['applied', 'screening', 'verification', 'offer'];
 const stageLabel = (k) => STAGES.find((s) => s.key === k)?.label ?? k;
@@ -145,7 +146,9 @@ export default function Recruitment({ go, id }) {
       <div className="co-card-top">
         <Avatar name={a.name} seed={a.info.guard?.id} src={a.info.guard?.avatar} size={36} />
         <div className="grow">
-          <div className="co-card-name">{a.name}</div>
+          <a href={`#/recruitment/${a.id}`} className="co-card-name dt2-card-link" draggable={false} onClick={(e) => e.stopPropagation()}>
+            {a.name}
+          </a>
           <div className="co-card-sub">{a.position}</div>
         </div>
         {cardMenu(a)}
@@ -161,7 +164,7 @@ export default function Recruitment({ go, id }) {
   );
 
   const columns = [
-    { key: 'name', header: 'Applicant', width: 'minmax(200px, 2fr)', sort: (a) => a.name, mobile: 'primary', render: (a) => (a.info.guard ? <GuardCell guard={a.info.guard} sub={a.position} /> : <span className="cell-person"><Avatar name={a.name} size={34} /><span className="cell-person-text"><span className="cell-name">{a.name}</span><span className="cell-sub">{a.position}</span></span></span>) },
+    { key: 'name', header: 'Applicant', width: 'minmax(200px, 2fr)', sort: (a) => a.name, mobile: 'primary', render: (a) => (a.info.guard ? <GuardCell guard={a.info.guard} sub={a.position} /> : <span className="cell-person"><Avatar name={a.name} size={34} /><span className="cell-person-text"><a href={`#/recruitment/${a.id}`} className="cell-name dt2-card-link" onClick={(e) => e.stopPropagation()}>{a.name}</a><span className="cell-sub">{a.position}</span></span></span>) },
     { key: 'stage', header: 'Stage', width: '120px', sort: (a) => STAGES.findIndex((s) => s.key === a.stage), mobile: 'aside', render: (a) => <Badge tone={a.stage === 'hired' ? 'ok' : a.stage === 'rejected' ? 'neutral' : 'info'}>{stageLabel(a.stage)}</Badge> },
     { key: 'site', header: 'Target site', width: 'minmax(160px, 1.4fr)', sort: (a) => siteById(db, a.siteId)?.name ?? '', mobile: 'meta', render: (a) => <SiteLabel id={a.siteId} /> },
     { key: 'network', header: 'Network', width: 'minmax(200px, 2fr)', mobile: 'secondary', render: (a) => <span className="chips"><NetworkBadges info={a.info} /></span> },
@@ -370,7 +373,13 @@ function ApplicantDrawer({ a, go, onClose, onEdit, onMove, onVerify, onDelete })
         <div className="notice notice-warn">
           <Warning size={16} />
           <span>
-            Currently employed by <b>{company(db, info.cur.companyId).name}</b> as {info.cur.position}. They need to record a separation before you can hire. Ask the applicant about their notice period.
+            Currently employed by{' '}
+            <b>
+              <EntityLink kind="company" id={info.cur.companyId} className="dt2-inline-link">
+                {company(db, info.cur.companyId).name}
+              </EntityLink>
+            </b>{' '}
+            as {info.cur.position}. They need to record a separation before you can hire. Ask the applicant about their notice period.
           </span>
         </div>
       )}
@@ -380,7 +389,7 @@ function ApplicantDrawer({ a, go, onClose, onEdit, onMove, onVerify, onDelete })
         {info.guard ? (
           <div className="stack-s">
             <div className="row between wrap gap-s">
-              <GuardCell guard={info.guard} size={44} onClick={() => go('guard', { id: info.guard.id })} />
+              <GuardCell guard={info.guard} size={44} />
               <Button variant="ghost" size="sm" iconRight={ArrowRight} onClick={() => go('guard', { id: info.guard.id })}>
                 Open passport
               </Button>
@@ -420,8 +429,11 @@ function ApplicantDrawer({ a, go, onClose, onEdit, onMove, onVerify, onDelete })
             <ul className="items">
               {info.requests.map((r) => (
                 <li key={r.id} className="tap" onClick={() => go('verification', { id: r.id })}>
-                  <CompanyCell id={r.toCompanyId} sub={`${r.requestedScopes.length} items · ${fromNow(r.createdAt)}`} />
+                  <CompanyCell id={r.toCompanyId} link={false} sub={`${r.requestedScopes.length} items · ${fromNow(r.createdAt)}`} />
                   <span className="grow" />
+                  <EntityLink kind="request" id={r.id} className="dt2-more">
+                    Open request
+                  </EntityLink>
                   <span className="chips">
                     <Badge tone={REQUEST_STATUS[r.status]?.tone} dot>
                       {REQUEST_STATUS[r.status]?.label}
@@ -451,7 +463,10 @@ function ApplicantDrawer({ a, go, onClose, onEdit, onMove, onVerify, onDelete })
           </li>
           {info.requests.map((r) => (
             <li key={r.id}>
-              Verification requested from {company(db, r.toCompanyId).name}
+              Verification requested from{' '}
+              <EntityLink kind="company" id={r.toCompanyId} className="dt2-inline-link">
+                {company(db, r.toCompanyId).name}
+              </EntityLink>
               <span>{fmtDate(r.createdAt)}</span>
             </li>
           ))}

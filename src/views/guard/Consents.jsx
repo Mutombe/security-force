@@ -3,8 +3,9 @@ import { ArrowRight, Check, Handshake, LockSimpleOpen, ShieldCheck, X } from '@p
 import { useStore } from '../../store';
 import { SCOPES, company, grantActive, scopeShort } from '../../access';
 import { Badge, Button, Card, ConfirmModal, DataTable, EmptyState, OrgMark, PageHead, addHours, daysUntil, fmtDate, fmtTime, fromNow } from '../../ui';
-import { CompanyCell, RequestStatus } from '../../components';
+import { CompanyCell, EntityLink, RequestStatus } from '../../components';
 import './guard.css';
+import '../detail/detail.css';
 
 export default function Consents() {
   const { db, session } = useStore();
@@ -40,7 +41,7 @@ export default function Consents() {
               <li key={g.id} className="gd-grant">
                 <OrgMark company={company(db, g.viewerCompanyId)} size={36} />
                 <div className="grow">
-                  <div className="item-title">{company(db, g.viewerCompanyId).name}</div>
+                  <div className="item-title"><EntityLink kind="company" id={g.viewerCompanyId} className="dt2-inline-link">{company(db, g.viewerCompanyId).name}</EntityLink></div>
                   <div className="item-sub">
                     {g.via === 'share' ? 'Through your share code' : `Records from ${company(db, g.sourceCompanyId).name}`} · {g.scopes.map(scopeShort).join(', ')}
                   </div>
@@ -63,7 +64,7 @@ export default function Consents() {
           rows={history}
           columns={[
             { key: 'from', header: 'Asked by', width: 'minmax(180px, 1.4fr)', mobile: 'primary', sort: (r) => company(db, r.fromCompanyId).name, render: (r) => <CompanyCell id={r.fromCompanyId} sub={fmtDate(r.createdAt)} size={28} /> },
-            { key: 'to', header: 'Records from', width: 'minmax(140px, 1fr)', mobile: 'secondary', render: (r) => <span className="gd-arrow"><ArrowRight size={13} /> {company(db, r.toCompanyId).name}</span> },
+            { key: 'to', header: 'Records from', width: 'minmax(140px, 1fr)', mobile: 'secondary', render: (r) => <span className="gd-arrow"><ArrowRight size={13} /> <EntityLink kind="company" id={r.toCompanyId} className="dt2-inline-link">{company(db, r.toCompanyId).name}</EntityLink></span> },
             { key: 'scopes', header: 'Scope', width: 'minmax(180px, 1.4fr)', mobile: 'meta', render: (r) => <span className="muted small">{(r.status === 'approved' ? r.releasedScopes : r.requestedScopes).map(scopeShort).join(', ')}</span> },
             { key: 'consent', header: 'Your consent', width: '130px', mobile: 'meta', render: (r) => <Badge tone={r.consent === 'declined' ? 'bad' : 'ok'}>{r.consent === 'offline' ? 'Signed form' : r.consent === 'declined' ? 'Declined' : 'Given'}</Badge> },
             { key: 'status', header: 'Outcome', width: '120px', align: 'right', mobile: 'aside', sort: (r) => r.status, render: (r) => <RequestStatus req={r} /> },
@@ -122,7 +123,7 @@ function ConsentCard({ req }) {
           <OrgMark company={from} size={40} />
           <div>
             <span className="gd-party-label">Asking</span>
-            <b>{from.name}</b>
+            <b><EntityLink kind="company" id={from.id} className="dt2-inline-link">{from.name}</EntityLink></b>
           </div>
         </div>
         <ArrowRight size={18} className="gd-party-arrow" />
@@ -130,7 +131,7 @@ function ConsentCard({ req }) {
           <OrgMark company={to} size={40} />
           <div>
             <span className="gd-party-label">Wants your records from</span>
-            <b>{to.name}</b>
+            <b><EntityLink kind="company" id={to.id} className="dt2-inline-link">{to.name}</EntityLink></b>
           </div>
         </div>
       </div>

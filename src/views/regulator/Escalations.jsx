@@ -3,9 +3,10 @@ import { ArrowRight, Buildings, ChatCircleText, Gavel, Scales } from '@phosphor-
 import { useStore } from '../../store';
 import { company, guardById } from '../../access';
 import { Badge, Button, DataTable, Drawer, EmptyState, Field, Modal, PageHead, Segmented, Tabs, fmtDate, fromNow } from '../../ui';
-import { CompanyCell, GuardCell, ResponseStatus } from '../../components';
+import { CompanyCell, GuardCell, ResponseStatus, EntityLink } from '../../components';
 import { TargetSummary, Timeline, firstName, targetOf } from '../trust/shared';
 import './regulator.css';
+import '../detail/detail.css';
 
 export default function Escalations({ go, id }) {
   const { db } = useStore();
@@ -79,7 +80,7 @@ function EscalationDrawer({ resp, onClose, go }) {
       <div className="tr-parties">
         <div>
           <span className="tr-party-label">Guard</span>
-          <GuardCell guard={g} size={34} onClick={() => go('guard', { id: g.id })} />
+          <GuardCell guard={g} size={34} />
         </div>
         <Scales size={20} />
         <div>
@@ -99,7 +100,7 @@ function EscalationDrawer({ resp, onClose, go }) {
           <div className="tr-voice">
             <div className="tr-voice-head">
               <span>
-                <ChatCircleText size={14} /> {g.name}
+                <ChatCircleText size={14} /> <EntityLink kind="guard" id={g.id} className="dt2-inline-link">{g.name}</EntityLink>
               </span>
               <span className="mono">{fmtDate(resp.createdAt)}</span>
             </div>
@@ -111,7 +112,7 @@ function EscalationDrawer({ resp, onClose, go }) {
           <div className="tr-voice tr-voice-company">
             <div className="tr-voice-head">
               <span>
-                <Buildings size={14} /> {co.name}
+                <Buildings size={14} /> <EntityLink kind="company" id={co.id} className="dt2-inline-link">{co.name}</EntityLink>
               </span>
               {resp.resolvedAt && <span className="mono">{fmtDate(resp.resolvedAt)}</span>}
             </div>

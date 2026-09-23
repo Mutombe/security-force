@@ -8,9 +8,10 @@ import {
   AvatarStack, Badge, Button, ConfirmModal, Drawer, EmptyState, Field, FilterSelect, Menu, Meter, Modal, PageHead, SearchInput,
   Segmented, Toggle, fmtTime, fromNow, plural, uid,
 } from '../../ui';
-import { GuardCell, LicenceBadge, RiskBadge } from '../../components';
+import { GuardCell, LicenceBadge, RiskBadge, EntityLink } from '../../components';
 import { AssignSiteModal } from '../../modals';
 import './company.css';
+import '../detail/detail.css';
 
 const lastCheck = (db, siteId) => db.checks.filter((c) => c.siteId === siteId).sort((a, b) => b.ts.localeCompare(a.ts))[0];
 const CHECK_TONE = { verified: 'ok', mismatch: 'bad', unassigned: 'warn', invalid: 'bad', bad_code: 'bad' };
@@ -95,7 +96,9 @@ export default function Sites({ go, id }) {
               >
                 <div className="co-site-top">
                   <div className="grow">
-                    <div className="co-site-name">{s.name}</div>
+                    <a href={`#/sites/${s.id}`} className="co-site-name dt2-card-link" onClick={(e) => e.stopPropagation()}>
+                      {s.name}
+                    </a>
                     <div className="co-site-client">{clientById(db, s.clientId)?.name ?? 'Internal site'}</div>
                   </div>
                   <SiteMenu site={s} onEdit={() => setModal({ kind: 'edit', site: s })} onToggle={() => setModal({ kind: 'toggle', site: s })} onDelete={() => setModal({ kind: 'delete', site: s })} onOpen={() => go('sites', { id: s.id })} />
@@ -241,7 +244,7 @@ function SiteDrawer({ site, go, onClose, onEdit, onToggle, onDelete }) {
           <ul className="items">
             {roster.map(({ e, g }) => (
               <li key={e.id}>
-                <GuardCell guard={g} sub={e.position} onClick={() => go('guard', { id: g.id })} />
+                <GuardCell guard={g} sub={e.position} />
                 <span className="grow" />
                 <span className="chips hide-sm">
                   <LicenceBadge guard={g} compact />
@@ -270,7 +273,15 @@ function SiteDrawer({ site, go, onClose, onEdit, onToggle, onDelete }) {
               <li key={k.id}>
                 <span className={`item-icon ${CHECK_TONE[k.result]}`}>{k.result === 'verified' ? <CheckCircle size={17} /> : <XCircle size={17} />}</span>
                 <div className="grow">
-                  <div className="item-title">{k.guardId ? guardById(db, k.guardId)?.name : <span className="mono">{k.input}</span>}</div>
+                  <div className="item-title">
+                    {k.guardId ? (
+                      <EntityLink kind="guard" id={k.guardId} className="dt2-inline-link">
+                        {guardById(db, k.guardId)?.name}
+                      </EntityLink>
+                    ) : (
+                      <span className="mono">{k.input}</span>
+                    )}
+                  </div>
                   <div className="item-sub">
                     Checked by {k.by} · {fmtTime(k.ts)}
                   </div>
@@ -462,7 +473,11 @@ function DeleteSiteModal({ site, onClose, onDeleted }) {
             </p>
             <div className="chips">
               {roster.map(({ g }) => (
-                <Badge key={g.id}>{g.name}</Badge>
+                <Badge key={g.id}>
+                  <EntityLink kind="guard" id={g.id} className="dt2-inline-link">
+                    {g.name}
+                  </EntityLink>
+                </Badge>
               ))}
             </div>
           </Modal>

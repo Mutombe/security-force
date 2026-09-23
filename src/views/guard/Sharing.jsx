@@ -3,7 +3,9 @@ import { Plus, ShareNetwork, Ticket } from '@phosphor-icons/react';
 import { useStore } from '../../store';
 import { SCOPES, company, scopeShort } from '../../access';
 import { Badge, Button, ConfirmModal, CopyButton, EmptyState, Field, Modal, OrgMark, PageHead, Segmented, addDays, fmtDate, fmtTime, fromNow } from '../../ui';
+import { EntityLink } from '../../components';
 import './guard.css';
+import '../detail/detail.css';
 
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const makeCode = () => {
@@ -77,7 +79,11 @@ export default function Sharing() {
                       {s.redemptions.map((r, i) => (
                         <li key={i}>
                           <OrgMark company={company(db, r.companyId)} size={22} />
-                          <span className="grow">{company(db, r.companyId).name}</span>
+                          <span className="grow">
+                            <EntityLink kind="company" id={r.companyId} className="dt2-inline-link">
+                              {company(db, r.companyId).name}
+                            </EntityLink>
+                          </span>
                           <span className="muted small">{fmtTime(r.at)}</span>
                         </li>
                       ))}

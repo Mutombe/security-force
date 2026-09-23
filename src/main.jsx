@@ -6,6 +6,9 @@ import { StoreProvider } from './store';
 import { RouterProvider } from './router';
 import App from './App';
 import './styles.css';
+import { applyTheme } from './theme';
+
+applyTheme();
 
 createRoot(document.getElementById('root')).render(
   <IconContext.Provider value={{ size: 18, weight: 'regular', mirrored: false }}>

@@ -29,14 +29,14 @@
 .ad-policy .setting-row:last-child { padding-bottom: 0; }
 .ad-policy-val { font-weight: 600; font-size: 14px; text-align: right; max-width: 45%; }
 
-.ad-secret { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--ink); border-radius: var(--r-sm); }
+.ad-secret { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--band); border-radius: var(--r-sm); }
 .ad-secret code { flex: 1; min-width: 0; color: #f1f1ee; font-size: 13px; overflow-wrap: anywhere; }
 .ad-upload { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px; border: 1px dashed var(--line-2); border-radius: var(--r); background: var(--surface-2); }
 .ad-preview { max-height: 240px; overflow-y: auto; border: 1px solid var(--line); border-radius: var(--r-sm); }
 .ad-preview-row { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: 13px; }
 .ad-preview-row:last-child { border-bottom: 0; }
 .ad-preview-note { font-size: 12px; color: var(--ok); white-space: nowrap; }
-.ad-preview-row.is-error { background: #fdf6f5; }
+.ad-preview-row.is-error { background: var(--error-row); }
 .ad-preview-row.is-error .ad-preview-note { color: var(--bad); }
 .ad-preview-row.is-same .ad-preview-note { color: var(--faint); }
 

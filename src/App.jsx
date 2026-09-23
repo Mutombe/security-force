@@ -3,13 +3,14 @@ import {
   ArrowLeft, ArrowRight, Bell, Buildings, CaretDown, CaretUpDown, ChartBar, ChatCircleText, Checks, ClockCounterClockwise,
   Database, DotsThreeOutline, DownloadSimple, Eye, GearSix, Handshake, IdentificationCard, Kanban, Key, Lightning,
   MagnifyingGlass, QrCode, Scales, ShareNetwork, ShieldCheck, SignOut, SquaresFour, UserCircle, UserPlus, Users, UsersThree,
-  WifiHigh, WifiSlash, X,
+  WifiHigh, WifiSlash, X, Desktop, Sun, Moon,
 } from '@phosphor-icons/react';
+import { useTheme } from './theme';
 import { DB_KEY, actorOf, useStore } from './store';
 import { useRouter } from './router';
 import { ROLES, company, currentEmployment, guardById, siteById, slaStatus } from './access';
 import {
-  Avatar, Badge, Button, IconButton, Kbd, Logo, Wordmark, Modal, OrgMark, PageSkeleton, Segmented, Tabs, Toaster, fromNow, useIsMobile,
+  Avatar, Badge, Button, DetailHost, IconButton, Kbd, Logo, Wordmark, Modal, OrgMark, PageSkeleton, Segmented, Tabs, Toaster, fromNow, useIsMobile,
   useOutside,
 } from './ui';
 import { AccountModal, AuthModal, LockScreen, WorkspaceModal } from './auth';
@@ -38,6 +39,8 @@ import AccessLog from './views/guard/Access';
 import ClientSites from './views/client/ClientSites';
 import ClientVerify from './views/client/ClientVerify';
 import ClientHistory from './views/client/ClientHistory';
+import CompanyProfile from './views/detail/CompanyProfile';
+import RecordDetail from './views/detail/RecordDetail';
 
 // ------------------------------------------------------------------ navigation
 function navFor(db, session) {
@@ -60,6 +63,8 @@ function navFor(db, session) {
       { key: 'settings', label: 'Settings & integrations', short: 'Settings', icon: GearSix, page: Settings },
       { key: 'audit', label: 'Audit trail', short: 'Audit', icon: ClockCounterClockwise, page: AuditTrail },
       { key: 'guard', hidden: true, label: 'Passport', skel: 'profile', page: GuardProfile },
+      { key: 'company', hidden: true, label: 'Company', skel: 'profile', page: CompanyProfile },
+      { key: 'record', hidden: true, label: 'Record', skel: 'profile', page: RecordDetail },
     ];
   }
   if (session.kind === 'guard') {
@@ -71,6 +76,8 @@ function navFor(db, session) {
       { key: 'sharing', label: 'Share my passport', short: 'Sharing', icon: ShareNetwork, page: Sharing },
       { key: 'responses', label: 'My responses', short: 'Responses', icon: ChatCircleText, page: Responses },
       { key: 'access', label: 'Who saw my record', short: 'Access log', icon: Eye, tab: true, page: AccessLog },
+      { key: 'company', hidden: true, label: 'Company', skel: 'profile', page: CompanyProfile },
+      { key: 'record', hidden: true, label: 'Record', skel: 'profile', page: RecordDetail },
     ];
   }
   if (session.kind === 'client') {
@@ -78,6 +85,7 @@ function navFor(db, session) {
       { key: 'sites', label: 'My sites', short: 'Sites', icon: Buildings, tab: true, page: ClientSites },
       { key: 'verify', label: 'Check a guard', short: 'Check', icon: ShieldCheck, tab: true, page: ClientVerify, noSkel: true },
       { key: 'history', label: 'Check history', short: 'History', icon: ClockCounterClockwise, tab: true, page: ClientHistory },
+      { key: 'company', hidden: true, label: 'Company', skel: 'profile', page: CompanyProfile },
     ];
   }
   const esc = db.responses.filter((r) => r.status === 'escalated').length;
@@ -89,7 +97,15 @@ function navFor(db, session) {
     { key: 'search', label: 'Registry', icon: MagnifyingGlass, tab: true, page: Search },
     { key: 'audit', label: 'Audit trail', short: 'Audit', icon: ClockCounterClockwise, page: AuditTrail },
     { key: 'guard', hidden: true, label: 'Passport', skel: 'profile', page: GuardProfile },
+    { key: 'record', hidden: true, label: 'Record', skel: 'profile', page: RecordDetail },
+    { key: 'company', hidden: true, label: 'Company', noSkel: true, page: RegulatorCompanyRedirect },
   ];
+}
+// Regulators see companies in their admin view; send shared company links there.
+function RegulatorCompanyRedirect({ id }) {
+  const { replace } = useRouter();
+  useEffect(() => replace('companies', { id }), [id, replace]);
+  return null;
 }
 function ArrowsIcon(props) {
   return <Handshake {...props} />;
@@ -235,7 +251,7 @@ function Shell() {
                 </span>
               )
             ) : (
-              isDetail && (
+              isDetail && (current?.hidden || !route.id) && (
                 <Button variant="subtle" size="sm" icon={ArrowLeft} onClick={back}>
                   Back
                 </Button>
@@ -276,11 +292,13 @@ function Shell() {
         )}
 
         <main className="content" id="main">
-          {Page && (
-            <PageLoader key={`${route.name}:${route.id ?? ''}`} variant={current.skel} skip={current.noSkel}>
-              <Page go={go} id={route.id} />
-            </PageLoader>
-          )}
+          <DetailHost key={`${route.name}:${route.id ?? ''}`}>
+            {Page && (
+              <PageLoader variant={route.id && !current.hidden ? 'profile' : current.skel} skip={current.noSkel}>
+                <Page go={go} id={route.id} />
+              </PageLoader>
+            )}
+          </DetailHost>
         </main>
       </div>
 
@@ -342,6 +360,32 @@ function PageLoader({ variant = 'table', skip, children }) {
   return ready ? <div className="page-enter">{children}</div> : <PageSkeleton variant={variant} />;
 }
 
+// ------------------------------------------------------------------ appearance
+const THEME_OPTIONS = [
+  { value: 'system', label: 'System', icon: Desktop },
+  { value: 'light', label: 'Light', icon: Sun },
+  { value: 'dark', label: 'Dark', icon: Moon },
+];
+
+function AppearanceControl() {
+  const { pref, setTheme } = useTheme();
+  return (
+    <div className="appearance">
+      <span className="appearance-label">Appearance</span>
+      <Segmented value={pref} onChange={setTheme} options={THEME_OPTIONS} className="appearance-seg" />
+    </div>
+  );
+}
+
+/** Compact button that cycles System → Light → Dark (used where there is no account menu). */
+function ThemeCycleButton() {
+  const { pref, setTheme } = useTheme();
+  const i = THEME_OPTIONS.findIndex((o) => o.value === pref);
+  const cur = THEME_OPTIONS[i < 0 ? 0 : i];
+  const next = THEME_OPTIONS[(i + 1) % THEME_OPTIONS.length];
+  return <IconButton icon={cur.icon} label={`Appearance: ${cur.label}. Switch to ${next.label.toLowerCase()}`} onClick={() => setTheme(next.value)} />;
+}
+
 // ------------------------------------------------------------------ account menu
 function AccountMenu({ actor, user, onAccount, onWorkspace, onDb, onLock, onSignOut }) {
   const [open, setOpen] = useState(false);
@@ -376,6 +420,8 @@ function AccountMenu({ actor, user, onAccount, onWorkspace, onDb, onLock, onSign
         <Key size={18} />
         <span className="grow">Lock session</span>
       </button>
+      <div className="menu-divider" />
+      <AppearanceControl />
       <div className="menu-divider" />
       <button type="button" className="menu-item danger" onClick={() => { setOpen(false); onSignOut(); }}>
         <SignOut size={18} />
@@ -665,6 +711,7 @@ function Landing() {
           <a href="#trust">Trust & privacy</a>
         </nav>
         <div className="row gap-s">
+          <ThemeCycleButton />
           <Button variant="ghost" onClick={() => open('guard')} className="hide-sm">
             I'm a guard
           </Button>

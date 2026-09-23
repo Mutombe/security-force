@@ -4,7 +4,9 @@ import { ArrowsOut, ArrowsIn, Clock, MapPin, ShieldCheck, ShieldWarning, SunDim,
 import { useStore } from '../../store';
 import { company, currentEmployment, guardById, licenceStatus, siteById } from '../../access';
 import { Avatar, Button, OrgMark, badgeCode, badgeSecondsLeft, fmtDate, useNow } from '../../ui';
+import { EntityLink } from '../../components';
 import './guard.css';
+import '../detail/detail.css';
 
 export default function LiveBadge() {
   const { db, session } = useStore();
@@ -95,7 +97,11 @@ export default function LiveBadge() {
             <div className="gd-badge-post">
               <OrgMark company={co} size={36} />
               <div className="grow">
-                <b>{co.name}</b>
+                <b>
+                  <EntityLink kind="company" id={co.id} className="dt2-inline-link">
+                    {co.name}
+                  </EntityLink>
+                </b>
                 <span>{cur.position}</span>
               </div>
               <div className="gd-badge-site">

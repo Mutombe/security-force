@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Check, EnvelopeSimple, Minus, PaperPlaneTilt, ShieldCheck, UserMinus, UserPlus, UserSwitch, Users } from '@phosphor-icons/react';
+import { Check, ClockCounterClockwise, DeviceMobile, EnvelopeSimple, Key, Minus, PaperPlaneTilt, ShieldCheck, UserMinus, UserPlus, UserSwitch, Users } from '@phosphor-icons/react';
 import { useStore } from '../../store';
-import { PERMISSIONS, ROLES, ROLE_PERMS, companyMembers, deniedHint, roleIn } from '../../access';
-import { Badge, Button, Card, ConfirmModal, DataTable, EmptyState, Field, Menu, Modal, PageHead, SearchInput, Stat, fromNow, uid } from '../../ui';
-import { PermissionNote, UserCell } from '../../components';
+import { PERMISSIONS, ROLES, ROLE_PERMS, company, companyMembers, deniedHint, roleIn } from '../../access';
+import { Avatar, Badge, Button, Card, ConfirmModal, DataTable, Drawer, EmptyState, Field, Menu, Modal, PageHead, SearchInput, Stat, fmtTime, fromNow, uid } from '../../ui';
+import { CompanyCell, PermissionNote, UserCell } from '../../components';
+import { ActivityTimeline } from '../profile/parts';
+import '../detail/detail.css';
 import './admin.css';
 
 const ROLE_TONE = { owner: 'hivis', hr: 'info', supervisor: 'neutral', viewer: 'neutral' };
@@ -41,7 +43,7 @@ function PermPreview({ role }) {
   );
 }
 
-export default function Team() {
+export default function Team({ id, go }) {
   const { db, session, can } = useStore();
   const me = session.companyId;
   const [q, setQ] = useState('');
@@ -117,7 +119,7 @@ export default function Team() {
       <div className="toolbar">
         <SearchInput value={q} onChange={setQ} placeholder="Search name or email" />
       </div>
-      <DataTable columns={columns} rows={rows} rowClass={(u) => (u.status === 'disabled' ? 'is-muted' : '')} empty={<EmptyState icon={Users} title="No members match" />} />
+      <DataTable columns={columns} rows={rows} onRowClick={(u) => go('team', { id: u.id })} rowClass={(u) => (u.status === 'disabled' ? 'is-muted' : '')} empty={<EmptyState icon={Users} title="No members match" />} />
 
       <Card title="Roles & permissions" subtitle="What each role can do in this workspace." flush>
         <div className="ad-matrix-wrap">
@@ -146,12 +148,161 @@ export default function Team() {
         </div>
       </Card>
 
+      {id && members.some((u) => u.id === id) && <MemberDetail user={members.find((u) => u.id === id)} owners={owners} setModal={setModal} onClose={() => go('team')} />}
+      {id && !members.some((u) => u.id === id) && (
+        <Drawer title="Member not found" backLabel="Team" onClose={() => go('team')}>
+          <EmptyState icon={Users} title="Not a member of this workspace" body="This person may have been removed from the team." />
+        </Drawer>
+      )}
+
       {modal?.kind === 'invite' && <InviteModal onClose={() => setModal(null)} />}
       {modal?.kind === 'role' && <RoleModal user={modal.user} owners={owners} onClose={() => setModal(null)} />}
       {modal?.kind === 'resend' && <ResendConfirm user={modal.user} onClose={() => setModal(null)} />}
       {modal?.kind === 'remove' && <RemoveConfirm user={modal.user} onClose={() => setModal(null)} />}
       {(modal?.kind === 'deactivate' || modal?.kind === 'reactivate') && <ActivationConfirm user={modal.user} reactivate={modal.kind === 'reactivate'} onClose={() => setModal(null)} />}
     </div>
+  );
+}
+
+function MemberDetail({ user: u, owners, setModal, onClose }) {
+  const { db, session, can } = useStore();
+  const me = session.companyId;
+  const role = roleIn(u, me);
+  const manage = can('team.manage');
+  const self = u.id === session.userId;
+  const lastOwner = role === 'owner' && owners.length <= 1;
+  const hint = !manage ? deniedHint(session, 'team.manage') : undefined;
+  const others = u.memberships.filter((m) => m.companyId !== me);
+  const sessions = db.sessions.filter((x) => x.userId === u.id);
+  const co = company(db, me);
+  const activity = db.audit.filter((a) => a.actorId === me && a.actorUser === u.name).slice(0, 30);
+  const statusBadge = (
+    <Badge tone={u.status === 'active' ? 'ok' : u.status === 'invited' ? 'info' : 'neutral'} dot>
+      {u.status === 'active' ? 'Active' : u.status === 'invited' ? 'Invited' : 'Deactivated'}
+    </Badge>
+  );
+  return (
+    <Drawer
+      title={u.name}
+      subtitle={`${u.title || 'Team member'} · ${co.name}`}
+      backLabel="Team"
+      onClose={onClose}
+      headerExtra={statusBadge}
+      footer={
+        <>
+          {u.status === 'invited' && (
+            <Button variant="ghost" icon={PaperPlaneTilt} disabledReason={hint} onClick={() => setModal({ kind: 'resend', user: u })}>
+              Resend invitation
+            </Button>
+          )}
+          {u.memberships.length === 1 && u.status !== 'invited' && (
+            <Button
+              variant="ghost"
+              icon={ShieldCheck}
+              disabledReason={hint ?? (self ? "You can't deactivate yourself." : lastOwner && u.status !== 'disabled' ? 'A company needs at least one owner.' : undefined)}
+              onClick={() => setModal({ kind: u.status === 'disabled' ? 'reactivate' : 'deactivate', user: u })}
+            >
+              {u.status === 'disabled' ? 'Reactivate' : 'Deactivate'}
+            </Button>
+          )}
+          <Button
+            variant="danger-ghost"
+            icon={UserMinus}
+            disabledReason={hint ?? (self ? "You can't remove yourself." : lastOwner ? 'A company needs at least one owner.' : undefined)}
+            onClick={() => setModal({ kind: 'remove', user: u })}
+          >
+            Remove
+          </Button>
+          <Button
+            icon={UserSwitch}
+            disabledReason={hint ?? (self ? "You can't change your own role." : lastOwner ? 'A company needs at least one owner.' : undefined)}
+            onClick={() => setModal({ kind: 'role', user: u })}
+          >
+            Change role
+          </Button>
+        </>
+      }
+    >
+      <section className="card dt2-hero">
+        <Avatar name={u.name} seed={u.id} src={u.avatar} size={88} />
+        <div className="dt2-hero-main">
+          <div className="eyebrow">{ROLES[role].label}</div>
+          <Badge tone={ROLE_TONE[role]}>{ROLES[role].desc}</Badge>
+          <dl className="dt2-contact">
+            <div>
+              <dt>
+                <EnvelopeSimple size={14} /> Email
+              </dt>
+              <dd>{u.email}</dd>
+            </div>
+            <div>
+              <dt>
+                <ClockCounterClockwise size={14} /> Last active
+              </dt>
+              <dd>{u.lastActiveAt ? fromNow(u.lastActiveAt) : 'Never signed in'}</dd>
+            </div>
+            {u.invitedAt && (
+              <div>
+                <dt>
+                  <PaperPlaneTilt size={14} /> Invited
+                </dt>
+                <dd>
+                  {fmtTime(u.invitedAt)}
+                  {u.invitedBy ? ` by ${u.invitedBy}` : ''}
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      </section>
+
+      <div className="grid-main">
+        <div className="stack">
+          <Card title={`What ${ROLES[role].label.toLowerCase()} can do`} subtitle={ROLES[role].desc} icon={Key}>
+            <PermPreview role={role} />
+          </Card>
+          <Card title="Recent activity" subtitle={`Actions ${u.name.split(' ')[0]} took in this workspace`} icon={ClockCounterClockwise}>
+            <ActivityTimeline entries={activity} empty="No recorded activity in this workspace." />
+          </Card>
+        </div>
+        <div className="stack">
+          <Card title="Other workspaces" subtitle="Companies this person also has access to">
+            {others.length ? (
+              <ul className="items">
+                {others.map((m) => (
+                  <li key={m.companyId}>
+                    <CompanyCell id={m.companyId} size={30} sub={ROLES[m.role].label} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <EmptyState compact body="Only a member of this company." />
+            )}
+          </Card>
+          <Card title="Signed-in devices" icon={DeviceMobile}>
+            {sessions.length ? (
+              <ul className="items">
+                {sessions.map((x) => (
+                  <li key={x.id}>
+                    <span className="item-icon">
+                      <DeviceMobile size={16} />
+                    </span>
+                    <div className="grow">
+                      <div className="item-title">{x.device}</div>
+                      <div className="item-sub">
+                        {x.location} · active {fromNow(x.lastSeenAt)}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <EmptyState compact body="Not signed in on any device." />
+            )}
+          </Card>
+        </div>
+      </div>
+    </Drawer>
   );
 }
 

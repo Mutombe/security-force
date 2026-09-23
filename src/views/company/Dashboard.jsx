@@ -8,10 +8,11 @@ import {
   STAGES, activeEmployments, company, companyReputation, complianceIssues, coverage, deniedHint, guardById, slaStatus,
 } from '../../access';
 import { Avatar, Badge, Button, Card, EmptyState, PageHead, Stat, fmtDate, fromNow, plural } from '../../ui';
-import { GuardCell, RiskBadge, SlaBadge } from '../../components';
+import { GuardCell, RiskBadge, SlaBadge, EntityLink } from '../../components';
 import { HireModal } from '../../modals';
 import { SiteModal } from './Sites';
 import './company.css';
+import '../detail/detail.css';
 
 export default function CompanyDashboard({ go }) {
   const { db, session, can } = useStore();
@@ -45,13 +46,13 @@ export default function CompanyDashboard({ go }) {
     ...data.incoming
       .map((r) => ({ key: r.id, tone: slaStatus(r)?.tone === 'bad' ? 'bad' : 'warn', icon: Handshake, rank: slaStatus(r)?.hours ?? 0,
         title: `${company(db, r.fromCompanyId).name} asks about ${guardById(db, r.guardId).name}`,
-        sub: `${r.requestedScopes.length} items requested · received ${fromNow(r.createdAt)}`, badge: <SlaBadge req={r} />, go: () => go('verification', { id: r.id }) })),
+        sub: `${r.requestedScopes.length} items requested · received ${fromNow(r.createdAt)}`, badge: <SlaBadge req={r} />, href: `#/verification/${r.id}`, go: () => go('verification', { id: r.id }) })),
     ...data.disputes.map((r) => ({ key: r.id, tone: 'warn', icon: ChatCircleText, rank: (new Date(r.dueAt) - Date.now()) / 3600000,
-      title: `${guardById(db, r.guardId).name} responded to a record`, sub: r.text, badge: <Badge tone="warn">Due {fmtDate(r.dueAt)}</Badge>, go: () => go('disputes', { id: r.id }) })),
+      title: `${guardById(db, r.guardId).name} responded to a record`, sub: r.text, badge: <Badge tone="warn">Due {fmtDate(r.dueAt)}</Badge>, href: `#/disputes/${r.id}`, go: () => go('disputes', { id: r.id }) })),
     ...data.gaps.map(({ s, c }) => ({ key: s.id, tone: s.risk === 'Critical' ? 'bad' : 'warn', icon: MapPin, rank: s.risk === 'Critical' ? -1000 : 100,
-      title: `${s.name} is short ${plural(c.posts - c.filled, 'post')}`, sub: `${s.risk} risk · ${s.shift} · ${c.filled} of ${c.posts} filled`, badge: <RiskBadge risk={s.risk} />, go: () => go('sites', { id: s.id }) })),
+      title: `${s.name} is short ${plural(c.posts - c.filled, 'post')}`, sub: `${s.risk} risk · ${s.shift} · ${c.filled} of ${c.posts} filled`, badge: <RiskBadge risk={s.risk} />, href: `#/sites/${s.id}`, go: () => go('sites', { id: s.id }) })),
     ...expiredLic.map((i) => ({ key: `lic-${i.guard.id}`, tone: 'bad', icon: ShieldWarning, rank: -500,
-      title: `${i.guard.name} is working without a valid licence`, sub: i.label, badge: <Badge tone="bad">Expired</Badge>, go: () => go('guard', { id: i.guard.id }) })),
+      title: `${i.guard.name} is working without a valid licence`, sub: i.label, badge: <Badge tone="bad">Expired</Badge>, href: `#/guard/${i.guard.id}`, go: () => go('guard', { id: i.guard.id }) })),
   ].sort((a, b) => a.rank - b.rank);
 
   const stages = STAGES.map((st) => ({ ...st, n: data.applicants.filter((a) => a.stage === st.key).length }));
@@ -128,7 +129,9 @@ export default function CompanyDashboard({ go }) {
                     <a.icon size={17} />
                   </span>
                   <div className="grow">
-                    <div className="item-title clamp-1">{a.title}</div>
+                    <a href={a.href} className="item-title clamp-1 dt2-card-link" onClick={(e) => e.stopPropagation()}>
+                      {a.title}
+                    </a>
                     <div className="item-sub clamp-1">{a.sub}</div>
                   </div>
                   {a.badge}
@@ -170,7 +173,7 @@ export default function CompanyDashboard({ go }) {
               {[...data.cov]
                 .sort((a, b) => a.c.pct - b.c.pct)
                 .map(({ s, c }) => (
-                  <button key={s.id} type="button" className="co-cov-row" onClick={() => go('sites', { id: s.id })}>
+                  <a key={s.id} href={`#/sites/${s.id}`} className="co-cov-row dt2-row-link">
                     <span className="co-cov-name">
                       <b>{s.name}</b>
                       <span>
@@ -183,7 +186,7 @@ export default function CompanyDashboard({ go }) {
                     <span className="mono small">
                       {c.filled}/{c.posts}
                     </span>
-                  </button>
+                  </a>
                 ))}
             </div>
           ) : (
@@ -210,13 +213,13 @@ export default function CompanyDashboard({ go }) {
         <Card title="Recruitment pipeline" icon={Kanban} actions={<Button variant="subtle" size="sm" iconRight={ArrowRight} onClick={() => go('recruitment')}>Open</Button>}>
           <div className="co-funnel">
             {stages.map((st) => (
-              <button key={st.key} type="button" className={`co-funnel-row ${st.key === 'rejected' ? 'rej' : st.key === 'hired' ? 'hired' : ''}`} onClick={() => go('recruitment')}>
+              <a key={st.key} href="#/recruitment" className={`co-funnel-row dt2-row-link ${st.key === 'rejected' ? 'rej' : st.key === 'hired' ? 'hired' : ''}`}>
                 <span>{st.label}</span>
                 <span className="co-funnel-bar">
                   <span style={{ width: `${(st.n / maxStage) * 100}%`, opacity: st.n ? undefined : 0 }} />
                 </span>
                 <b>{st.n}</b>
-              </button>
+              </a>
             ))}
           </div>
         </Card>
@@ -230,8 +233,25 @@ export default function CompanyDashboard({ go }) {
                   <li key={a.id}>
                     <Avatar name={a.actorUser || a.actor} seed={u?.id} src={u?.avatar} size={28} />
                     <div className="co-activity-text grow">
-                      <b>{a.actorUser || a.actor}</b> {a.action.toLowerCase()}
-                      <span className="co-activity-detail">{a.detail}</span>
+                      <b>
+                        {u ? (
+                          <EntityLink kind="user" id={u.id} className="dt2-inline-link">
+                            {a.actorUser}
+                          </EntityLink>
+                        ) : (
+                          a.actorUser || a.actor
+                        )}
+                      </b>{' '}
+                      {a.action.toLowerCase()}
+                      <span className="co-activity-detail">
+                        {a.guardId ? (
+                          <EntityLink kind="guard" id={a.guardId} className="dt2-inline-link">
+                            {a.detail}
+                          </EntityLink>
+                        ) : (
+                          a.detail
+                        )}
+                      </span>
                     </div>
                     <span className="co-time">{fromNow(a.ts)}</span>
                   </li>

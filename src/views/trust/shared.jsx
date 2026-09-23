@@ -2,7 +2,9 @@
 import { Check, Circle, Clock, X } from '@phosphor-icons/react';
 import { RECORD_TYPES, guardById } from '../../access';
 import { Badge, fmtDate, fmtTime } from '../../ui';
+import { EntityLink } from '../../components';
 import './trust.css';
+import '../detail/detail.css';
 
 /** What a guard response is about: the record or the separation it answers. */
 export function targetOf(db, resp) {
@@ -27,7 +29,7 @@ export function TargetSummary({ db, resp }) {
           {r.severity && <Badge>{r.severity}</Badge>}
           {r.retracted && <Badge tone="ok">Retracted</Badge>}
         </div>
-        <div className="tr-target-title">{r.title}</div>
+        <div className="tr-target-title"><EntityLink kind="record" id={r.id} className="dt2-inline-link">{r.title}</EntityLink></div>
         {r.detail && <p className="tr-target-detail">{r.detail}</p>}
         <dl className="tr-kv">
           <div><dt>Date</dt><dd>{fmtDate(r.date)}</dd></div>

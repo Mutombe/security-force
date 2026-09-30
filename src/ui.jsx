@@ -127,7 +127,7 @@ export function OrgMark({ company, size = 32 }) {
   if (!company) return null;
   if (company.logo)
     return (
-      <span className="orgmark orgmark-logo" style={{ width: size, height: size, padding: Math.max(2, Math.round(size * 0.1)) }} title={company.name}>
+      <span className="orgmark orgmark-logo" style={{ width: size, height: size }} title={company.name}>
         <img src={company.logo} alt={company.name} draggable="false" />
       </span>
     );

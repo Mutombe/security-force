@@ -116,7 +116,7 @@ export function SignInModal({ initial = 'choose', onClose }) {
   );
 
   return (
-    <Modal size="sm" title={step === 'choose' ? <Wordmark height={30} /> : step === 'company' ? 'Company sign in' : step === 'guard' ? 'Guard sign in' : 'Enter your code'} onClose={onClose}>
+    <Modal size="sm" title={step === 'choose' ? <Wordmark height={34} /> : step === 'company' ? 'Company sign in' : step === 'guard' ? 'Guard sign in' : 'Enter your code'} onClose={onClose}>
       <div className="auth">
         {step === 'choose' && (
           <>

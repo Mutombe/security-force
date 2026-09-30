@@ -60,7 +60,7 @@ function Shell() {
     <div className="app">
       <header className="topbar">
         <div className="topbar-inner">
-          {mobile && current?.hidden ? <IconButton icon={ArrowLeft} label="Back" onClick={back} /> : <a href="#/" className="brand-link" aria-label="ProCheQ home"><Wordmark height={mobile ? 24 : 28} /></a>}
+          {mobile && current?.hidden ? <IconButton icon={ArrowLeft} label="Back" onClick={back} /> : <a href="#/" className="brand-link" aria-label="ProCheQ home"><Wordmark height={mobile ? 30 : 36} /></a>}
           {!mobile && (
             <nav className="topnav" aria-label="Main">
               {tabs.map((n) => (

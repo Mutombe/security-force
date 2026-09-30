@@ -75,7 +75,7 @@ export default function Landing() {
   return (
     <div className="landing">
       <header className="land-nav">
-        <Wordmark height={30} />
+        <Wordmark height={36} />
         <div className="row gap-s">
           <ThemeToggle />
           <Button variant="ghost" onClick={() => setSignIn('guard')} className="hide-sm">I'm a guard</Button>
@@ -85,7 +85,6 @@ export default function Landing() {
 
       <section className="land-hero">
         <div className="land-hero-copy">
-          <Wordmark height={64} tagline />
           <h1>Know who you're hiring. Know who's at the gate.</h1>
           <p className="lead">
             ProCheQ is a shared, verified record of every security guard's career, confirmed by the companies that employed them. Guards own it and approve who sees it.

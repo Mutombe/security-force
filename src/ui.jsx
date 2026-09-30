@@ -80,20 +80,19 @@ export function useOutside(ref, onOutside, active = true) {
 }
 
 // ---------- brand ----------
-export function Logo({ size = 30, invert }) {
-  return <img src="/brand/mark.png" alt="Security Force" className={`logo-mark ${invert ? 'is-invert' : ''}`} style={{ height: size, width: 'auto' }} draggable="false" />;
+/** ProCheQ icon (the Q magnifier with the guard). */
+export function Logo({ size = 30 }) {
+  return <img src="/brand/procheq-mark.png" alt="ProCheQ" className="logo-mark" style={{ height: size, width: size }} draggable="false" />;
 }
 
-/** Full "SECURITY FORCE" lockup. variant: 'horizontal' | 'stacked' */
-export function Wordmark({ height = 34, variant = 'horizontal', invert }) {
+/** ProCheQ wordmark. `tagline` adds "Verify | Connect | Secure". Swaps to white text in dark mode. */
+export function Wordmark({ height = 30, tagline = false }) {
+  const base = tagline ? '/brand/procheq' : '/brand/procheq-wordmark';
   return (
-    <img
-      src={variant === 'stacked' ? '/brand/lockup-stacked.png' : '/brand/lockup.png'}
-      alt="Security Force"
-      className={`logo-lockup ${invert ? 'is-invert' : ''}`}
-      style={{ height, width: 'auto' }}
-      draggable="false"
-    />
+    <span className="wordmark" style={{ height }}>
+      <img src={`${base}.png`} alt="ProCheQ" className="wordmark-light" style={{ height }} draggable="false" />
+      <img src={`${base}-dark.png`} alt="" aria-hidden="true" className="wordmark-dark" style={{ height }} draggable="false" />
+    </span>
   );
 }
 

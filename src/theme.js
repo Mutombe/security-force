@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 // Appearance preference: 'system' (default — follows the device), 'light' or 'dark'.
 // Stored per browser in localStorage; applied as <html data-theme> (absent for system).
-const KEY = 'securityforce.theme';
+const KEY = 'procheq.theme';
 const media = () => window.matchMedia('(prefers-color-scheme: dark)');
 
 export function getTheme() {
@@ -19,7 +19,7 @@ export function applyTheme(pref = getTheme()) {
   const root = document.documentElement;
   if (pref === 'system') root.removeAttribute('data-theme');
   else root.setAttribute('data-theme', pref);
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', effectiveTheme(pref) === 'dark' ? '#0e1014' : '#f6f5f1');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', effectiveTheme(pref) === 'dark' ? '#060c1c' : '#f4f6fb');
 }
 
 export function setTheme(pref) {

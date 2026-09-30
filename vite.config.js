@@ -7,6 +7,6 @@ export default defineConfig({
   // Pre-bundle these up front so the dev server never serves a stale optimized copy
   // (the "504 Outdated Optimize Dep" error) after dependencies change.
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-dom/client', 'qrcode', '@phosphor-icons/react', '@dicebear/core', '@dicebear/notionists'],
+    include: ['react', 'react-dom', 'react-dom/client', '@phosphor-icons/react', '@dicebear/core', '@dicebear/notionists'],
   },
 });
